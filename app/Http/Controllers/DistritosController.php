@@ -13,7 +13,7 @@ class DistritosController extends Controller
 
     public function show($codigo)
     {
-        $distrito = Distrito::_show($codigo);
+        $distrito = Distrito::_provincia($codigo);
 
         $conditional = empty($distrito);
 

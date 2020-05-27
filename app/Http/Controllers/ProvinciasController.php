@@ -13,7 +13,7 @@ class ProvinciasController extends Controller
 
     public function show($codigo)
     {
-        $provincia = Provincia::_show($codigo);
+        $provincia = Provincia::_departamento($codigo);
 
         $conditional = empty($provincia);
 

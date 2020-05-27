@@ -30,4 +30,15 @@ class Provincia extends Model
             'distritos' => $distritos
         ];
     }
+
+    public static function _departamento($codigo)
+    {
+        $provincia = self::_show($codigo);
+        $departamento = Departamento::_show($provincia->COD_REG);
+
+        return [
+            'provincia' => self::_show($codigo),
+            'departamento' => $departamento
+        ];
+    }
 }

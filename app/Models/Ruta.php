@@ -26,4 +26,14 @@ class Ruta extends Model
             'COD_RUTA' => $codigo_ruta
         ])->get();
     }
+
+    public static function _troncal($id_empresa, $codigo_troncal, $codigo_ruta)
+    {
+        $troncal = Troncal::_show($id_empresa, $codigo_troncal);
+
+        return [
+            'ruta' => self::_show($id_empresa, $codigo_troncal, $codigo_ruta),
+            'troncal' => $troncal
+        ];
+    }
 }

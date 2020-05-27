@@ -13,7 +13,7 @@ class RutaController extends Controller
 
     public function show($id_empresa, $codigo_troncal, $codigo_ruta)
     {
-        $ruta = Ruta::_show($id_empresa, $codigo_troncal, $codigo_ruta);
+        $ruta = Ruta::_troncal($id_empresa, $codigo_troncal, $codigo_ruta);
 
         $conditional = empty($ruta);
 

@@ -17,4 +17,17 @@ class Distrito extends Model
             'COD_COM' => $codigo
         ])->first();
     }
+
+    public static function _provincia($codigo)
+    {
+        $distrito = self::_show($codigo);
+        $provincia = Provincia::_show($distrito->COD_PROVC);
+        $departamento = Departamento::_show($provincia->COD_REG);
+
+        return [
+            'distrito' => $distrito,
+            'provincia' => $provincia,
+            'departamento' => $departamento
+        ];
+    }
 }
