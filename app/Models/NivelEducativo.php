@@ -20,6 +20,6 @@ class NivelEducativo extends Model
         return self::where([
             'idEmpresa' => $id_empresa,
             'idNivel' => $id_nivel_educativo
-        ])->get();
+        ])->first();
     }
 }

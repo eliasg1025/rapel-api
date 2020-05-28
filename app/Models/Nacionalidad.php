@@ -20,6 +20,6 @@ class Nacionalidad extends Model
         return self::where([
             'idEmpresa' => $id_empresa,
             'idNacionalidad' => $id_nacionalidad
-        ])->get();
+        ])->first();
     }
 }

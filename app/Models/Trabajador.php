@@ -23,9 +23,10 @@ class Trabajador extends Model
         $trabajador = self::_show($id_empresa, $dni);
         $nacionalidad = Nacionalidad::_show($id_empresa, $trabajador->IdNacionalidad);
         $localidad = Distrito::_provincia($trabajador->COD_COM);
-        $nivel_educativo = NivelEducativo::_show($id_empresa, $trabajador->idNivel);
+        $nivel_educativo = NivelEducativo::_show($id_empresa, $trabajador->IdNivel);
         $tipo_via = TipoVia::_show($id_empresa, $trabajador->IdTipoVia);
         $tipo_zona = TipoZona::_show($id_empresa, $trabajador->IdTipoZona);
+        $ruta = Ruta::_troncal($id_empresa, $trabajador->COD_TRONCAL, $trabajador->COD_RUTA);
 
         return [
             'trabajador' => $trabajador,
@@ -33,7 +34,8 @@ class Trabajador extends Model
             'localidad' => $localidad,
             'nivel_educativo' => $nivel_educativo,
             'tipo_via' => $tipo_via,
-            'tipo_zona' => $tipo_zona
+            'tipo_zona' => $tipo_zona,
+            'ruta' => $ruta,
         ];
     }
 }

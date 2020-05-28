@@ -15,6 +15,6 @@ class TipoZona extends Model
         return self::where([
             'idEmpresa' => $id_empresa,
             'idTipoZona' => $id_tipo_zona
-        ]);
+        ])->first();
     }
 }

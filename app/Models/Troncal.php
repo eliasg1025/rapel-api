@@ -20,7 +20,7 @@ class Troncal extends Model
         return self::where([
             'IDEMPRESA' => $id_empresa,
             'COD_TRONCAL' => $codigo
-        ])->get();
+        ])->first();
     }
 
     public static function _rutas($id_empresa, $codigo)

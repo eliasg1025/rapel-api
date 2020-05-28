@@ -15,6 +15,6 @@ class TipoVia extends Model
         return self::where([
             'idEmpresa' => $id_empresa,
             'idTipoVia' => $id_tipo_via
-        ]);
+        ])->first();
     }
 }

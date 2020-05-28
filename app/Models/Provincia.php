@@ -14,6 +14,7 @@ class Provincia extends Model
     {
         return self::where([
             'COD_PAIS' => 'PE',
+            'COD_EMP' => 'ARAP',
             'COD_PROVC' => $codigo
         ])->first();
     }

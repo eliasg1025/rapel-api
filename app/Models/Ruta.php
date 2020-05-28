@@ -15,7 +15,7 @@ class Ruta extends Model
         return self::where([
             'IDEMPRESA' => $id_empresa,
             'COD_TRONCAL' => $codigo_troncal
-        ])->get();
+        ])->first();
     }
 
     public static function _show($id_empresa, $codigo_troncal, $codigo_ruta)
@@ -24,7 +24,7 @@ class Ruta extends Model
             'IDEMPRESA' => $id_empresa,
             'COD_TRONCAL' => $codigo_troncal,
             'COD_RUTA' => $codigo_ruta
-        ])->get();
+        ])->first();
     }
 
     public static function _troncal($id_empresa, $codigo_troncal, $codigo_ruta)
