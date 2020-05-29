@@ -11,9 +11,9 @@ class TipoViaController extends Controller
         //
     }
 
-    public function get()
+    public function get($id_empresa)
     {
-        $tipo_vias = TipoVia::all();
+        $tipo_vias = TipoVia::_get($id_empresa);
 
         return response()->json([
             'message' => sizeof($tipo_vias) === 0 ? 'No se encontraron tipos de vias' : 'Tipos de vias obtenidos',

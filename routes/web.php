@@ -26,8 +26,8 @@ $router->group(['prefix' => 'central'], function () use ($router) {
     $router->get('/provincia/{codigo}', 'ProvinciasController@show');
     $router->get('/provincia/{codigo}/distritos', 'ProvinciasController@distritos');
     $router->get('/distrito/{codigo}', 'DistritosController@show');
-    $router->get('/tipo-zona', 'TipoZonaController@get');
-    $router->get('/tipo-via', 'TipoViaController@get');
+    $router->get('/tipo-zona/{id_empresa}', 'TipoZonaController@get');
+    $router->get('/tipo-via/{id_empresa}', 'TipoViaController@get');
     $router->get('/nacionalidad/{id_empresa}', 'NacionalidadController@get');
     $router->get('/nacionalidad/{id_empresa}/{id_nacionalidad}', 'NacionalidadController@show');
     $router->get('/nivel_educativo/{id_empresa}', 'NivelEducativoController@get');
@@ -36,4 +36,5 @@ $router->group(['prefix' => 'central'], function () use ($router) {
     $router->get('/troncal/{id_empresa}/{codigo}', 'TroncalController@show');
     $router->get('/troncal/{id_empresa}/{codigo}/rutas', 'TroncalController@rutas');
     $router->get('/ruta/{id_empresa}/{codigo_troncal}/{codigo_ruta}', 'RutaController@show');
+    $router->get('/zona-labor/{id_empresa}', 'ZonaLaborController@get');
 });

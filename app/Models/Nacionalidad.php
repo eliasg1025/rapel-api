@@ -10,9 +10,13 @@ class Nacionalidad extends Model
 
     protected $table = 'dbo.Nacionalidad';
 
+    public $incrementing = false;
+
     public static function _get($id_empresa)
     {
-        return self::where('idEmpresa', $id_empresa)->get();
+        return self::where([
+            'idEmpresa' => $id_empresa
+        ])->select('IdEmpresa as empresa_id', 'IdNacionalidad as id', 'Descripcion as name')->get();
     }
 
     public static function _show($id_empresa, $id_nacionalidad)
