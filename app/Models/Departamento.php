@@ -10,9 +10,11 @@ class Departamento extends Model
 
     protected $table = 'dbo.REGION';
 
+    public $incrementing = false;
+
     public static function _get()
     {
-        return self::where('COD_PAIS', 'PE')->get();
+        return self::where('COD_PAIS', 'PE')->select('COD_REG as id', 'NOMBRE as name', 'COD_PAIS as pais_id')->get();
     }
 
     public static function _show($codigo)
@@ -20,15 +22,12 @@ class Departamento extends Model
         return self::where([
             'COD_PAIS' => 'PE',
             'COD_REG' => $codigo
-        ])->first();
+        ])->select('COD_REG as id', 'NOMBRE as name', 'COD_PAIS as pais_id')->first();
     }
 
     public static function _provincias($codigo)
     {
-        $provincias = Provincia::where([
-            'COD_PAIS' => 'PE',
-            'COD_REG' => $codigo
-        ])->get();
+        $provincias = Provincia::_get($codigo);
 
         return [
             'departamento' => self::_show($codigo),

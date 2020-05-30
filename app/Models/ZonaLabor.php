@@ -10,6 +10,8 @@ class ZonaLabor extends Model
 
     protected $table = 'dbo.Zona';
 
+    public $incrementing = false;
+
     public static function _get($id_empresa)
     {
         return self::where([
