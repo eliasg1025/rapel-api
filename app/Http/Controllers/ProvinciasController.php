@@ -19,7 +19,7 @@ class ProvinciasController extends Controller
 
         return response()->json([
             'message' => $conditional ? 'No se encontro la provincia' : 'Provincia obtenida',
-            'data' => $provincia
+            'data' => array_unique($provincia)
         ], $conditional ? 404 : 200);
     }
 

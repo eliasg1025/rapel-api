@@ -18,6 +18,8 @@ $router->get('/', function () use ($router) {
 });
 
 $router->group(['prefix' => 'central'], function () use ($router) {
+    $router->get('/data/por-empresa', 'DataController@porEmpresa');
+    $router->get('/data/localidades', 'DataController@localidades');
     $router->get('/trabajador/{id_empresa}/{dni}', 'TrabajadoresController@show');
     $router->get('/trabajador/{id_empresa}/{dni}/info', 'TrabajadoresController@info');
     $router->get('/departamento', 'DepartamentosController@get');

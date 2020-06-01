@@ -12,12 +12,22 @@ class Provincia extends Model
 
     public $incrementing = false;
 
+    public static function _all()
+    {
+        return self::where([
+            'COD_PAIS' => 'PE',
+            'COD_EMP' => 'ARAP',
+            'COD_TEM' => '20'
+        ])->select('COD_PROVC as id', 'DESCRIPCION as name', 'COD_REG as departamento_id', 'COD_PAIS as pais_id')->get();
+    }
+
     public static function _get($codigo_departamento)
     {
         return self::where([
             'COD_PAIS' => 'PE',
             'COD_REG' => $codigo_departamento,
             'COD_EMP' => 'ARAP',
+            'COD_TEM' => '20'
         ])->select('COD_PROVC as id', 'DESCRIPCION as name', 'COD_REG as departamento_id', 'COD_PAIS as pais_id')->get();
     }
 
@@ -26,16 +36,14 @@ class Provincia extends Model
         return self::where([
             'COD_PAIS' => 'PE',
             'COD_EMP' => 'ARAP',
-            'COD_PROVC' => $codigo
+            'COD_PROVC' => $codigo,
+            'COD_TEM' => '20',
         ])->select('COD_PROVC as id', 'DESCRIPCION as name', 'COD_REG as departamento_id', 'COD_PAIS as pais_id')->first();
     }
 
     public static function _distritos($codigo)
     {
-        $distritos = Distrito::where([
-            'COD_PAIS' => 'PE',
-            'COD_PROVC' => $codigo
-        ])->get();
+        $distritos = Distrito::_get($codigo);
 
         return [
             'provincia' => self::_show($codigo),

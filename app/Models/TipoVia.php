@@ -12,6 +12,12 @@ class TipoVia extends Model
 
     public $incrementing = false;
 
+    public static function _all()
+    {
+        return self::where('idEmpresa', "9")->orWhere('idEmpresa', '14')
+            ->select('IdTipoVia as id', 'Descripcion as name', 'IdEmpresa as empresa_id')->get();
+    }
+
     public static function _get($id_empresa)
     {
         return self::where([

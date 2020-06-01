@@ -12,6 +12,12 @@ class ZonaLabor extends Model
 
     public $incrementing = false;
 
+    public static function _all()
+    {
+        return self::where('IdEmpresa', "9")->orWhere('IdEmpresa', "14")
+            ->select('IdZona as id', 'IdEmpresa as empresa_id', 'Nombre as name')->get();
+    }
+
     public static function _get($id_empresa)
     {
         return self::where([
