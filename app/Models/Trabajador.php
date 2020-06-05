@@ -12,10 +12,18 @@ class Trabajador extends Model
 
     public static function _show($id_empresa, $dni)
     {
-        return self::where([
+        $conditions = [
             'idEmpresa' => $id_empresa,
             'RutTrabajador' => $dni
-        ])->first();
+        ];
+
+        $trabajador = self::where($conditions)->first();
+
+        $contratos = Contrato::where($conditions)->orderBy('FechaInicio', 'desc')->get();
+
+        $trabajador->contratos = $contratos;
+
+        return $trabajador;
     }
 
     public static function _info($id_empresa, $dni)
