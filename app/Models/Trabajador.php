@@ -19,7 +19,10 @@ class Trabajador extends Model
 
         $trabajador = self::where($conditions)->first();
 
-        $contratos = Contrato::where($conditions)->orderBy('FechaInicio', 'desc')->get();
+        $contratos = Contrato::where($conditions)
+                        ->orderBy('FechaInicio', 'desc')
+                        ->select('IdContrato as code', 'FechaInicio as fecha_inicio', 'FechaTermino as fecha_termino', 'FechaTerminoC as fecha_termino_c', 'SueldoBase as sueldo_base', 'Cussp as cussp', 'IdTrabajador as trabajador_code', 'IdEmpresa as empresa_code', 'IdZona as zona_labor_code')
+                        ->get();
 
         $trabajador->contratos = $contratos;
 
