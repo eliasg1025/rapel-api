@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Trabajador extends Model
@@ -47,6 +48,50 @@ class Trabajador extends Model
             'tipo_via' => $tipo_via,
             'tipo_zona' => $tipo_zona,
             'ruta' => $ruta,
+        ];
+    }
+
+    public static function revision(array $trabajadores=[])
+    {
+        $registrados = [];
+        $no_registrados = [];
+
+        foreach ($trabajadores as $trabajador) {
+            $rut = $trabajador['rut'];
+            $t =  Trabajador::where([
+                'RutTrabajador' => $rut,
+                'IdEmpresa' => ['9', '14']
+            ])->first();
+
+            if ($t) {
+                array_push($registrados, [
+                    'rut' => $rut,
+                    'trabajador' => [
+                        'nombre' => $t->Nombre,
+                        'apellido_paterno' => $t->ApellidoPaterno,
+                        'apellido_materno' => $t->ApellidoMaterno,
+                        'fecha_nacimiento' => Carbon::parse($t->FechaNacimiento)->format('Y-m-d'),
+                        'sexo' => $t->Sexo,
+                        'email' => $t->Mail,
+                        'tipo_zona_id' => $t->IdTipoZona,
+                        'nombre_zona' => $t->NombreZona,
+                        'tipo_via_id' => $t->IdTipoVia,
+                        'nombre_via' => $t->NombreVia,
+                        'direccion' => $t->Direccion,
+                        'distrito_id' => $t->COD_COM,
+                        'estado_civil_id' => $t->EstadoCivil,
+                        'nacionalidad_id' => $t->IdNacionalidad,
+                    ],
+                    'contrato' => $trabajador
+                ]);
+            } else {
+                array_push($no_registrados, $trabajador);
+            }
+        }
+
+        return [
+            'registrados' => $registrados,
+            'no_registrados' => $no_registrados
         ];
     }
 }

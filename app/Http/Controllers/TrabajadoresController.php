@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Trabajador;
+use Illuminate\Http\Request;
 
 class TrabajadoresController extends Controller
 {
@@ -29,5 +30,11 @@ class TrabajadoresController extends Controller
             'message' => empty($trabajador) ? 'No se encontro trabajador' : 'Trabajador obtenido',
             'data' => $trabajador
         ], empty($trabajador) ? 404 : 200);
+    }
+
+    public function revision(Request $request)
+    {
+        $result = Trabajador::revision($request->trabajadores);
+        return response()->json($result);
     }
 }
