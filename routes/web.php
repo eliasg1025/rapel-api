@@ -40,4 +40,11 @@ $router->group(['prefix' => 'central'], function () use ($router) {
     $router->get('/troncal/{id_empresa}/{codigo}/rutas', 'TroncalController@rutas');
     $router->get('/ruta/{id_empresa}/{codigo_troncal}/{codigo_ruta}', 'RutaController@show');
     $router->get('/zona-labor/{id_empresa}', 'ZonaLaborController@get');
+    $router->get('/oficio/{id_empresa}', 'OficioController@get');
+    $router->get('/agrupacion/{id_empresa}', 'AgrupacionController@get');
+    $router->get('/regimen', 'RegimenController@get');
+    $router->get('/actividad/{id_empresa}', 'ActividadController@get');
+    $router->get('/tipo-contrato/{id_empresa}', 'TipoContratoController@get');
+    $router->get('/cuartel/{id_empresa}/{id_zona_labor}', 'CuartelController@get');
+    $router->get('/labor/{id_empresa}/{id_actividad}', 'LaborController@get');
 });

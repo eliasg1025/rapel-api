@@ -63,6 +63,9 @@ class Trabajador extends Model
                 'IdEmpresa' => ['9', '14']
             ])->first();
 
+            $alertas = AlertaTrabajador::get($trabajador['rut']);
+            $contrato_activo = Contrato::activo($trabajador['rut']);
+
             if ($t) {
                 array_push($registrados, [
                     'rut' => $rut,
@@ -82,7 +85,9 @@ class Trabajador extends Model
                         'estado_civil_id' => $t->EstadoCivil,
                         'nacionalidad_id' => $t->IdNacionalidad,
                     ],
-                    'contrato' => $trabajador
+                    'contrato' => $trabajador,
+                    'alertas' => $alertas,
+                    'contrato_activo' => $contrato_activo
                 ]);
             } else {
                 array_push($no_registrados, $trabajador);

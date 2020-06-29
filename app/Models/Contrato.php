@@ -19,4 +19,14 @@ class Contrato extends Model
             'RutTrabajador' => $dni
         ])->get();
     }
+
+    public static function activo($rut)
+    {
+        return self::where([
+            'RutTrabajador' => $rut,
+            'IndicadorVigencia' => '1'
+        ])
+        ->select('IdContrato as contrato_id', 'IdEmpresa as empresa_id', 'FechaInicio as fecha_inicio', 'IdZona as zona_id', 'FechaTerminoC as fecha_termino_c')
+        ->get();
+    }
 }

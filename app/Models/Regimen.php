@@ -9,5 +9,10 @@ class Regimen extends Model
     protected $connection = 'sqlsrv';
 
     //
-    protected $table = 'dbo.Cuartel';
+    protected $table = 'dbo.TipoRegimen';
+
+    public static function _all()
+    {
+        return self::select('IdTipo as id', 'Descripcion as name')->get();
+    }
 }
