@@ -58,10 +58,7 @@ class Trabajador extends Model
 
         foreach ($trabajadores as $trabajador) {
             $rut = $trabajador['rut'];
-            $t =  Trabajador::where([
-                'RutTrabajador' => $rut,
-                'IdEmpresa' => ['9', '14']
-            ])->first();
+            $t =  Trabajador::where('RutTrabajador', $rut)->whereIn('IdEmpresa', ['9', '14'])->first();
 
             $alertas = AlertaTrabajador::get($trabajador['rut']);
             $contrato_activo = Contrato::activo($trabajador['rut']);

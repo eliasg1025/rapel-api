@@ -15,7 +15,7 @@ class Cuartel extends Model
     public static function _all()
     {
         return self::whereIn('IdEmpresa', ['9', '14'])
-            ->select('IdCuartel as id', 'IdZona as zona_labor_id', 'Nombre as name', 'COD_SUBCENTRO as cod_subcentro', 'NOM_SUBCENTRO as nom_subcentro')
+            ->select('IdCuartel as id', 'IdEmpresa as empresa_id', 'IdZona as zona_labor_id', 'Nombre as name', 'COD_SUBCENTRO as cod_subcentro', 'NOM_SUBCENTRO as nom_subcentro')
             ->get();
     }
 
@@ -25,7 +25,7 @@ class Cuartel extends Model
             'IdEmpresa' => $id_empresa,
             'IdZona'    => $id_zona_labor
         ])
-            ->select('IdCuartel as id', 'IdZona as zona_labor_id', 'Nombre as name', 'COD_SUBCENTRO as cod_subcentro', 'NOM_SUBCENTRO as nom_subcentro')
+            ->select('IdCuartel as id', 'IdEmpresa as empresa_id', 'IdZona as zona_labor_id', 'Nombre as name', 'COD_SUBCENTRO as cod_subcentro', 'NOM_SUBCENTRO as nom_subcentro')
             ->get();
     }
 }
