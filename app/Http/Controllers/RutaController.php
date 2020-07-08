@@ -11,9 +11,19 @@ class RutaController extends Controller
         //
     }
 
+    public function get($id_empresa, $codigo)
+    {
+        $data = Ruta::_get($id_empresa, $codigo);
+
+        return response()->json([
+            'message' => 'Data obtenida',
+            'data' => $data
+        ], 200);
+    }
+
     public function show($id_empresa, $codigo_troncal, $codigo_ruta)
     {
-        $ruta = Ruta::_troncal($id_empresa, $codigo_troncal, $codigo_ruta);
+        $ruta = Ruta::_show($id_empresa, $codigo_troncal, $codigo_ruta);
 
         $conditional = empty($ruta);
 

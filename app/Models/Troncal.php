@@ -8,11 +8,13 @@ class Troncal extends Model
 {
     protected $connection = 'sqlsrv';
 
+    public $incrementing = false;
+
     protected $table = 'dbo.TRONCAL';
 
     public static function _get($id_empresa)
     {
-        return self::where('IDEMPRESA', $id_empresa)->get();
+        return self::where('IDEMPRESA', $id_empresa)->select('IDEMPRESA as empresa_id', 'COD_TRONCAL as id', 'DESCRIPCION as name')->get();
     }
 
     public static function _show($id_empresa, $codigo)
@@ -20,7 +22,9 @@ class Troncal extends Model
         return self::where([
             'IDEMPRESA' => $id_empresa,
             'COD_TRONCAL' => $codigo
-        ])->first();
+        ])
+        ->select('IDEMPRESA as empresa_id', 'COD_TRONCAL as troncal_id', 'DESCRIPCION as name')
+        ->first();
     }
 
     public static function _rutas($id_empresa, $codigo)

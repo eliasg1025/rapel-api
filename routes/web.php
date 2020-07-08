@@ -17,10 +17,10 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-$router->group(['prefix' => 'central'], function () use ($router) {
+$router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('/data/por-empresa', 'DataController@porEmpresa');
     $router->get('/data/localidades', 'DataController@localidades');
-    $router->get('/trabajador/{id_empresa}/{dni}', 'TrabajadoresController@show');
+    $router->get('/trabajador/{dni}', 'TrabajadoresController@show');
     $router->get('/trabajador/{id_empresa}/{dni}/info', 'TrabajadoresController@info');
     $router->post('/trabajador/revision', 'TrabajadoresController@revision');
     $router->get('/departamento', 'DepartamentosController@get');
@@ -38,6 +38,7 @@ $router->group(['prefix' => 'central'], function () use ($router) {
     $router->get('/troncal/{id_empresa}', 'TroncalController@get');
     $router->get('/troncal/{id_empresa}/{codigo}', 'TroncalController@show');
     $router->get('/troncal/{id_empresa}/{codigo}/rutas', 'TroncalController@rutas');
+    $router->get('/ruta/{id_empresa}/{codigo}', 'RutaController@get');
     $router->get('/ruta/{id_empresa}/{codigo_troncal}/{codigo_ruta}', 'RutaController@show');
     $router->get('/zona-labor/{id_empresa}', 'ZonaLaborController@get');
     $router->get('/oficio/{id_empresa}', 'OficioController@get');

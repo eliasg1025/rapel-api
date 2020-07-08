@@ -11,28 +11,41 @@ class Trabajador extends Model
 
     protected $table = 'dbo.Trabajador';
 
-    public static function _show($id_empresa, $dni)
+    public static function _show($dni)
     {
-        $conditions = [
-            'idEmpresa' => $id_empresa,
-            'RutTrabajador' => $dni
+        $t =  Trabajador::where('RutTrabajador', $dni)->whereIn('IdEmpresa', ['9', '14'])->first();
+
+        $alertas = AlertaTrabajador::get($dni);
+        $contrato_activo = Contrato::activo($dni);
+
+        return [
+            'rut' => $dni,
+            'trabajador' => [
+                'rut' => $dni,
+                'nombre' => $t->Nombre,
+                'apellido_paterno' => $t->ApellidoPaterno,
+                'apellido_materno' => $t->ApellidoMaterno,
+                'fecha_nacimiento' => Carbon::parse($t->FechaNacimiento)->format('Y-m-d'),
+                'sexo' => $t->Sexo,
+                'email' => $t->Mail,
+                'tipo_zona_id' => $t->IdTipoZona,
+                'nombre_zona' => $t->NombreZona,
+                'tipo_via_id' => $t->IdTipoVia,
+                'nombre_via' => $t->NombreVia,
+                'direccion' => $t->Direccion,
+                'distrito_id' => $t->COD_COM,
+                'estado_civil_id' => $t->EstadoCivil,
+                'nacionalidad_id' => $t->IdNacionalidad,
+                'empresa_id' => $t->IdEmpresa
+            ],
+            'alertas' => $alertas,
+            'contrato_activo' => $contrato_activo
         ];
-
-        $trabajador = self::where($conditions)->first();
-
-        $contratos = Contrato::where($conditions)
-                        ->orderBy('FechaInicio', 'desc')
-                        ->select('IdContrato as code', 'FechaInicio as fecha_inicio', 'FechaTermino as fecha_termino', 'FechaTerminoC as fecha_termino_c', 'SueldoBase as sueldo_base', 'Cussp as cussp', 'IdTrabajador as trabajador_code', 'IdEmpresa as empresa_code', 'IdZona as zona_labor_code')
-                        ->get();
-
-        $trabajador->contratos = $contratos;
-
-        return $trabajador;
     }
 
     public static function _info($id_empresa, $dni)
     {
-        $trabajador = self::_show($id_empresa, $dni);
+        $trabajador = self::_show($dni);
         $nacionalidad = Nacionalidad::_show($id_empresa, $trabajador->IdNacionalidad);
         $localidad = Distrito::_provincia($trabajador->COD_COM);
         $nivel_educativo = NivelEducativo::_show($id_empresa, $trabajador->IdNivel);
@@ -67,6 +80,7 @@ class Trabajador extends Model
                 array_push($registrados, [
                     'rut' => $rut,
                     'trabajador' => [
+                        'rut' => $rut,
                         'nombre' => $t->Nombre,
                         'apellido_paterno' => $t->ApellidoPaterno,
                         'apellido_materno' => $t->ApellidoMaterno,
@@ -81,6 +95,7 @@ class Trabajador extends Model
                         'distrito_id' => $t->COD_COM,
                         'estado_civil_id' => $t->EstadoCivil,
                         'nacionalidad_id' => $t->IdNacionalidad,
+                        'empresa_id' => $t->IdEmpresa
                     ],
                     'contrato' => $trabajador,
                     'alertas' => $alertas,

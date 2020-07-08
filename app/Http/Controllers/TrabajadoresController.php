@@ -12,9 +12,9 @@ class TrabajadoresController extends Controller
         //
     }
 
-    public function show($id_empresa, $dni)
+    public function show($dni)
     {
-        $trabajador = Trabajador::_show($id_empresa, $dni);
+        $trabajador = Trabajador::_show($dni);
 
         return response()->json([
             'message' => empty($trabajador) ? 'No se encontro trabajador' : 'Trabajador obtenido',
