@@ -19,7 +19,7 @@ class TrabajadoresController extends Controller
         return response()->json([
             'message' => $trabajador ? 'Trabajador obtenido' : 'No se encontro trabajador',
             'data' => $trabajador
-        ], $trabajador ? 404 : 200);
+        ], $trabajador ? 200 : 404);
     }
 
     public function info($id_empresa, $dni)
