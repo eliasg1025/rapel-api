@@ -17,9 +17,9 @@ class TrabajadoresController extends Controller
         $trabajador = Trabajador::_show($dni);
 
         return response()->json([
-            'message' => empty($trabajador) ? 'No se encontro trabajador' : 'Trabajador obtenido',
+            'message' => $trabajador ? 'No se encontro trabajador' : 'Trabajador obtenido',
             'data' => $trabajador
-        ], empty($trabajador) ? 404 : 200);
+        ], $trabajador ? 404 : 200);
     }
 
     public function info($id_empresa, $dni)

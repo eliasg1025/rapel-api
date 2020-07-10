@@ -13,34 +13,38 @@ class Trabajador extends Model
 
     public static function _show($dni)
     {
-        $t =  Trabajador::where('RutTrabajador', $dni)->whereIn('IdEmpresa', ['9', '14'])->first();
+        try {
+            $t =  Trabajador::where('RutTrabajador', $dni)->whereIn('IdEmpresa', ['9', '14'])->first();
 
-        $alertas = AlertaTrabajador::get($dni);
-        $contrato_activo = Contrato::activo($dni);
+            $alertas = AlertaTrabajador::get($dni);
+            $contrato_activo = Contrato::activo($dni);
 
-        return [
-            'rut' => $dni,
-            'trabajador' => [
+            return [
                 'rut' => $dni,
-                'nombre' => $t->Nombre,
-                'apellido_paterno' => $t->ApellidoPaterno,
-                'apellido_materno' => $t->ApellidoMaterno,
-                'fecha_nacimiento' => Carbon::parse($t->FechaNacimiento)->format('Y-m-d'),
-                'sexo' => $t->Sexo,
-                'email' => $t->Mail,
-                'tipo_zona_id' => $t->IdTipoZona,
-                'nombre_zona' => $t->NombreZona,
-                'tipo_via_id' => $t->IdTipoVia,
-                'nombre_via' => $t->NombreVia,
-                'direccion' => $t->Direccion,
-                'distrito_id' => $t->COD_COM,
-                'estado_civil_id' => $t->EstadoCivil,
-                'nacionalidad_id' => $t->IdNacionalidad,
-                'empresa_id' => $t->IdEmpresa
-            ],
-            'alertas' => $alertas,
-            'contrato_activo' => $contrato_activo
-        ];
+                'trabajador' => [
+                    'rut' => $dni,
+                    'nombre' => $t->Nombre,
+                    'apellido_paterno' => $t->ApellidoPaterno,
+                    'apellido_materno' => $t->ApellidoMaterno,
+                    'fecha_nacimiento' => Carbon::parse($t->FechaNacimiento)->format('Y-m-d'),
+                    'sexo' => $t->Sexo,
+                    'email' => $t->Mail,
+                    'tipo_zona_id' => $t->IdTipoZona,
+                    'nombre_zona' => $t->NombreZona,
+                    'tipo_via_id' => $t->IdTipoVia,
+                    'nombre_via' => $t->NombreVia,
+                    'direccion' => $t->Direccion,
+                    'distrito_id' => $t->COD_COM,
+                    'estado_civil_id' => $t->EstadoCivil,
+                    'nacionalidad_id' => $t->IdNacionalidad,
+                    'empresa_id' => $t->IdEmpresa
+                ],
+                'alertas' => $alertas,
+                'contrato_activo' => $contrato_activo
+            ];
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public static function _info($id_empresa, $dni)
