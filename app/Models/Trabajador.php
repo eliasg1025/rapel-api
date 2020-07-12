@@ -107,7 +107,10 @@ class Trabajador extends Model
                     'contrato_activo' => $contrato_activo
                 ]);
             } else {
-                array_push($no_registrados, $trabajador);
+                array_push($no_registrados, [
+                    'rut' => $rut,
+                    'contrato' => $trabajador
+                ]);
             }
         }
 
