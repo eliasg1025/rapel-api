@@ -37,4 +37,10 @@ class TrabajadoresController extends Controller
         $result = Trabajador::revision($request->trabajadores);
         return response()->json($result);
     }
+
+    public function revisionSinTrabajadores(Request $request)
+    {
+        $result = Trabajador::revision($request->trabajadores, false);
+        return response()->json($result);
+    }
 }

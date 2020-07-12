@@ -68,7 +68,7 @@ class Trabajador extends Model
         ];
     }
 
-    public static function revision(array $trabajadores=[])
+    public static function revision(array $trabajadores=[], $con_trabajador=true)
     {
         $registrados = [];
         $no_registrados = [];
@@ -81,26 +81,27 @@ class Trabajador extends Model
             $contrato_activo = Contrato::activo($trabajador['rut']);
 
             if ($t) {
+                $data_trabajador = $con_trabajador ? [
+                    'rut' => $rut,
+                    'nombre' => $t->Nombre,
+                    'apellido_paterno' => $t->ApellidoPaterno,
+                    'apellido_materno' => $t->ApellidoMaterno,
+                    'fecha_nacimiento' => Carbon::parse($t->FechaNacimiento)->format('Y-m-d'),
+                    'sexo' => $t->Sexo,
+                    'email' => $t->Mail,
+                    'tipo_zona_id' => $t->IdTipoZona,
+                    'nombre_zona' => $t->NombreZona,
+                    'tipo_via_id' => $t->IdTipoVia,
+                    'nombre_via' => $t->NombreVia,
+                    'direccion' => $t->Direccion,
+                    'distrito_id' => $t->COD_COM,
+                    'estado_civil_id' => $t->EstadoCivil,
+                    'nacionalidad_id' => $t->IdNacionalidad,
+                    'empresa_id' => $t->IdEmpresa
+                ] : null;
                 array_push($registrados, [
                     'rut' => $rut,
-                    'trabajador' => [
-                        'rut' => $rut,
-                        'nombre' => $t->Nombre,
-                        'apellido_paterno' => $t->ApellidoPaterno,
-                        'apellido_materno' => $t->ApellidoMaterno,
-                        'fecha_nacimiento' => Carbon::parse($t->FechaNacimiento)->format('Y-m-d'),
-                        'sexo' => $t->Sexo,
-                        'email' => $t->Mail,
-                        'tipo_zona_id' => $t->IdTipoZona,
-                        'nombre_zona' => $t->NombreZona,
-                        'tipo_via_id' => $t->IdTipoVia,
-                        'nombre_via' => $t->NombreVia,
-                        'direccion' => $t->Direccion,
-                        'distrito_id' => $t->COD_COM,
-                        'estado_civil_id' => $t->EstadoCivil,
-                        'nacionalidad_id' => $t->IdNacionalidad,
-                        'empresa_id' => $t->IdEmpresa
-                    ],
+                    'trabajador' => $data_trabajador,
                     'contrato' => $trabajador,
                     'alertas' => $alertas,
                     'contrato_activo' => $contrato_activo
