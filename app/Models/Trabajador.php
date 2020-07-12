@@ -109,7 +109,8 @@ class Trabajador extends Model
             } else {
                 array_push($no_registrados, [
                     'rut' => $rut,
-                    'contrato' => $trabajador
+                    'contrato' => $trabajador,
+                    'trabajador' => null,
                 ]);
             }
         }
