@@ -49,4 +49,6 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('/tipo-contrato/{id_empresa}', 'TipoContratoController@get');
     $router->get('/cuartel/{id_empresa}/{id_zona_labor}', 'CuartelController@get');
     $router->get('/labor/{id_empresa}/{id_actividad}', 'LaborController@get');
+    $router->get('/banco', 'BancoController@all');
+    $router->get('/banco/{id_empresa}', 'BancoController@get');
 });
