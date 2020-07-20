@@ -51,4 +51,5 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('/labor/{id_empresa}/{id_actividad}', 'LaborController@get');
     $router->get('/banco', 'BancoController@all');
     $router->get('/banco/{id_empresa}', 'BancoController@get');
+    $router->get('/afp/{id_empresa}', 'AfpController@get');
 });
