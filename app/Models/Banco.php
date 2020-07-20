@@ -23,6 +23,7 @@ class Banco extends Model
     {
         return self::where('IdEmpresa', $id_empresa)
             ->select('IdEmpresa as empresa_id', 'IdBanco as  id', 'Cod_Equ as cod_equ', 'Nombre as name')
+            ->where('cod_equ', '<>', null)
             ->get();
     }
 }
