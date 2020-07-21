@@ -38,7 +38,8 @@ class Trabajador extends Model
                     'estado_civil_id' => $t->EstadoCivil,
                     'nacionalidad_id' => $t->IdNacionalidad,
                     'empresa_id' => $t->IdEmpresa,
-                    'numero_cuenta' => $t->NumeroCuentaBancaria
+                    'numero_cuenta' => $t->NumeroCuentaBancaria,
+                    'banco_id' => $t->IdBanco
                 ],
                 'alertas' => $alertas,
                 'contrato_activo' => $contrato_activo
