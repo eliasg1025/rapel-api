@@ -14,7 +14,7 @@ class Trabajador extends Model
     public static function _show($dni)
     {
         try {
-            $t =  Trabajador::where('RutTrabajador', $dni)->whereIn('IdEmpresa', ['9', '14'])->first();
+            $t =  Trabajador::where('RutTrabajador', $dni)->whereIn('IdEmpresa', ['9', '14'])->orderBy('IdTrabajador', 'DESC')->first();
 
             $alertas = AlertaTrabajador::get($dni);
             $contrato_activo = Contrato::activo($dni);
