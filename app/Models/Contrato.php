@@ -29,7 +29,7 @@ class Contrato extends Model
         ->select(
             'IdContrato as contrato_id',
             'IdEmpresa as empresa_id',
-            'FechaInicio as fecha_inicio',
+            'FechaInicioPeriodo as fecha_inicio',
             'IdZona as zona_id',
             'FechaTerminoC as fecha_termino_c',
             'IdAfp as afp_id'
