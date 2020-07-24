@@ -64,7 +64,7 @@ class Trabajador extends Model
                     $contrato_activo['empresa_id'],
                     $contrato_activo['zona_id']
                 );
-                $contrato_activo['cuartel_id'] = Cuartel::_show(
+                $contrato_activo['cuartel'] = Cuartel::_show(
                     $contrato_activo['empresa_id'],
                     $contrato_activo['zona_id'],
                     $contrato_activo['cuartel_id']
