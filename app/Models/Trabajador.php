@@ -69,9 +69,10 @@ class Trabajador extends Model
                     $contrato_activo['zona_id'],
                     $contrato_activo['cuartel_id']
                 );
+                unset($contrato_activo['cuartel_id']);
+                unset($contrato_activo['oficio_id']);
+                unset($contrato_activo['zona_id']);
             }
-
-            //$oficio = Oficio::_show()
 
             return $info;
         } catch (\Exception $e) {
