@@ -42,32 +42,41 @@ class Trabajador extends Model
                     'banco_id' => $t->IdBanco
                 ],
                 'alertas' => $alertas,
-                'contrato_activo' => $contrato_activo
+                'contrato_activo' => $contrato_activo,
+                'ultimo_contrato' => [],
             ];
         } catch (\Exception $e) {
             return false;
         }
     }
 
-    public static function _info($id_empresa, $dni)
+    public static function _info($dni)
     {
-        $trabajador = self::_show($dni);
-        $nacionalidad = Nacionalidad::_show($id_empresa, $trabajador->IdNacionalidad);
-        $localidad = Distrito::_provincia($trabajador->COD_COM);
-        $nivel_educativo = NivelEducativo::_show($id_empresa, $trabajador->IdNivel);
-        $tipo_via = TipoVia::_show($id_empresa, $trabajador->IdTipoVia);
-        $tipo_zona = TipoZona::_show($id_empresa, $trabajador->IdTipoZona);
-        $ruta = Ruta::_troncal($id_empresa, $trabajador->COD_TRONCAL, $trabajador->COD_RUTA);
+        try {
+            $info = self::_show($dni);
 
-        return [
-            'trabajador' => $trabajador,
-            'nacionalidad' => $nacionalidad,
-            'localidad' => $localidad,
-            'nivel_educativo' => $nivel_educativo,
-            'tipo_via' => $tipo_via,
-            'tipo_zona' => $tipo_zona,
-            'ruta' => $ruta,
-        ];
+            foreach ($info['contrato_activo'] as &$contrato_activo) {
+                $contrato_activo['oficio'] = Oficio::_show(
+                    $contrato_activo['empresa_id'],
+                    $contrato_activo['oficio_id'],
+                );
+                $contrato_activo['zona_labor'] = ZonaLabor::_show(
+                    $contrato_activo['empresa_id'],
+                    $contrato_activo['zona_id']
+                );
+                $contrato_activo['cuartel_id'] = Cuartel::_show(
+                    $contrato_activo['empresa_id'],
+                    $contrato_activo['zona_id'],
+                    $contrato_activo['cuartel_id']
+                );
+            }
+
+            //$oficio = Oficio::_show()
+
+            return $info;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public static function revision(array $trabajadores=[], $con_trabajador=true)

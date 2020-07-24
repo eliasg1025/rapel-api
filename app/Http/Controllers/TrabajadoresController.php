@@ -22,9 +22,9 @@ class TrabajadoresController extends Controller
         ], $trabajador ? 200 : 404);
     }
 
-    public function info($id_empresa, $dni)
+    public function info($dni)
     {
-        $trabajador = Trabajador::_info($id_empresa, $dni);
+        $trabajador = Trabajador::_info($dni);
 
         return response()->json([
             'message' => empty($trabajador) ? 'No se encontro trabajador' : 'Trabajador obtenido',

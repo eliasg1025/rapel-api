@@ -21,7 +21,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('/data/por-empresa', 'DataController@porEmpresa');
     $router->get('/data/localidades', 'DataController@localidades');
     $router->get('/trabajador/{dni}', 'TrabajadoresController@show');
-    $router->get('/trabajador/{id_empresa}/{dni}/info', 'TrabajadoresController@info');
+    $router->get('/trabajador/{dni}/info', 'TrabajadoresController@info');
     $router->post('/trabajador/revision', 'TrabajadoresController@revision');
     $router->post('/trabajador/revision/sin-trabajadores', 'TrabajadoresController@revisionSinTrabajadores');
     $router->get('/departamento', 'DepartamentosController@get');

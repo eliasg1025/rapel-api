@@ -24,4 +24,12 @@ class ZonaLabor extends Model
             'IdEmpresa' => $id_empresa
         ])->select('IdZona as id', 'IdEmpresa as empresa_id', 'Nombre as name')->get();
     }
+
+    public static function _show($id_empresa, $id)
+    {
+        return self::where([
+            'IdEmpresa' => $id_empresa,
+            'IdZona' => $id
+        ])->select('IdZona as id', 'IdEmpresa as empresa_id', 'Nombre as name')->first();
+    }
 }

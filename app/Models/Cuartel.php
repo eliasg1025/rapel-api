@@ -28,4 +28,15 @@ class Cuartel extends Model
             ->select('IdCuartel as id', 'IdEmpresa as empresa_id', 'IdZona as zona_labor_id', 'Nombre as name', 'COD_SUBCENTRO as cod_subcentro', 'NOM_SUBCENTRO as nom_subcentro')
             ->get();
     }
+
+    public static function _show($id_empresa, $id_zona_labor, $id)
+    {
+        return self::where([
+            'IdEmpresa' => $id_empresa,
+            'IdZona'    => $id_zona_labor,
+            'IdCuartel' => $id
+        ])
+            ->select('IdCuartel as id', 'IdEmpresa as empresa_id', 'IdZona as zona_labor_id', 'Nombre as name', 'COD_SUBCENTRO as cod_subcentro', 'NOM_SUBCENTRO as nom_subcentro')
+            ->first();
+    }
 }

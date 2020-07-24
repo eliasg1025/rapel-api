@@ -32,7 +32,9 @@ class Contrato extends Model
             'FechaInicioPeriodo as fecha_inicio',
             'IdZona as zona_id',
             'FechaTerminoC as fecha_termino_c',
-            'IdAfp as afp_id'
+            'IdAfp as afp_id',
+            'IdOficio as oficio_id',
+            'IdCuartel as cuartel_id'
         )
         ->get();
     }
