@@ -43,4 +43,10 @@ class TrabajadoresController extends Controller
         $result = Trabajador::revision($request->trabajadores, false);
         return response()->json($result);
     }
+
+    public function buscar(Request $request)
+    {
+        $palabra = $request->query('t');
+        return Trabajador::buscar($palabra);
+    }
 }

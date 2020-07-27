@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Trabajador extends Model
 {
@@ -78,6 +79,32 @@ class Trabajador extends Model
         } catch (\Exception $e) {
             return false;
         }
+    }
+
+    public static function buscar(string $busqueda)
+    {
+        return DB::table('dbo.Trabajador as t')
+            ->select(
+                't.RutTrabajador',
+                't.Nombre',
+                't.ApellidoPaterno',
+                't.ApellidoMaterno',
+                'c.IdEmpresa'
+            )
+            ->join('dbo.Contratos as c', [
+                'c.IdEmpresa'     => 't.IdEmpresa',
+                'c.RutTrabajador' => 't.RutTrabajador'
+            ])
+            ->whereIn('c.IdEmpresa', [9, 14])
+            ->whereIn('c.IdRegimen', [1, 2])
+            ->where('c.IndicadorVigencia', '1')
+            ->where('c.Jornal', '0')
+            ->where(function($query) use ($busqueda) {
+                return $query->where('t.Nombre', 'like', '%' . $busqueda . '%')
+                        ->orWhere('t.ApellidoPaterno', 'like', '%' . $busqueda . '%')
+                        ->orWhere('t.ApellidoMaterno', 'like', '%' . $busqueda . '%');
+            })
+            ->get();
     }
 
     public static function revision(array $trabajadores=[], $con_trabajador=true)
