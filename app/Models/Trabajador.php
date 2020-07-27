@@ -83,27 +83,31 @@ class Trabajador extends Model
 
     public static function buscar(string $busqueda)
     {
+        $trabajadores = DB::table('dbo.Trabajador as t')
+            ->select(
+                't.IdTrabajador',
+                DB::raw("(cast (t.Nombre as varchar) + cast(' ' as varchar) + cast(t.ApellidoPaterno as varchar) + cast(' ' as varchar) + cast(t.ApellidoMaterno as varchar)) as Nombres")
+            );
+
         return DB::table('dbo.Trabajador as t')
             ->select(
-                't.RutTrabajador',
-                't.Nombre',
-                't.ApellidoPaterno',
-                't.ApellidoMaterno',
-                'c.IdEmpresa'
+                't.IdTrabajador as id',
+                't.RutTrabajador as rut',
+                'c.IdEmpresa as empresa_id',
+                'trab.Nombres as nombre_completo'
             )
             ->join('dbo.Contratos as c', [
                 'c.IdEmpresa'     => 't.IdEmpresa',
                 'c.RutTrabajador' => 't.RutTrabajador'
             ])
+            ->joinSub($trabajadores, 'trab', function($join) {
+                $join->on('trab.IdTrabajador', '=', 't.IdTrabajador');
+            })
             ->whereIn('c.IdEmpresa', [9, 14])
             ->whereIn('c.IdRegimen', [1, 2])
             ->where('c.IndicadorVigencia', '1')
             ->where('c.Jornal', '0')
-            ->where(function($query) use ($busqueda) {
-                return $query->where('t.Nombre', 'like', '%' . $busqueda . '%')
-                        ->orWhere('t.ApellidoPaterno', 'like', '%' . $busqueda . '%')
-                        ->orWhere('t.ApellidoMaterno', 'like', '%' . $busqueda . '%');
-            })
+            ->where('trab.Nombres', 'like', '%' . $busqueda . '%')
             ->get();
     }
 
