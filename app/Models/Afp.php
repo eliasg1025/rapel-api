@@ -26,4 +26,12 @@ class Afp extends Model
             ->where('Nombre', '<>', 'SIN REGIMEN PENSIONARIO')
             ->get();
     }
+
+    public static function _show($id_empresa, $id)
+    {
+        return self::where([
+            'IdEmpresa' => $id_empresa,
+            'IdAfp' => $id
+        ])->select('IdEmpresa as empresa_id', 'IdAfp as id', 'Nombre as name', 'IdSistemaPublico as publico')->first();
+    }
 }

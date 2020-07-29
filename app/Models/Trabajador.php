@@ -70,6 +70,10 @@ class Trabajador extends Model
                     $contrato_activo['zona_id'],
                     $contrato_activo['cuartel_id']
                 );
+                $contrato_activo['afp'] = Afp::_show(
+                    $contrato_activo['empresa_id'],
+                    $contrato_activo['afp_id']
+                );
                 unset($contrato_activo['cuartel_id']);
                 unset($contrato_activo['oficio_id']);
                 unset($contrato_activo['zona_id']);
