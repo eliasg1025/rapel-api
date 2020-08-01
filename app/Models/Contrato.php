@@ -24,7 +24,7 @@ class Contrato extends Model
     {
         return self::where([
             'RutTrabajador' => $rut,
-            'IndicadorVigencia' => '1'
+            //'IndicadorVigencia' => '1'
         ])
         ->select(
             'IdContrato as contrato_id',

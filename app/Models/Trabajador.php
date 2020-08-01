@@ -111,7 +111,7 @@ class Trabajador extends Model
             })
             ->whereIn('c.IdEmpresa', [9, 14])
             ->whereIn('c.IdRegimen', [1, 2])
-            //->where('c.IndicadorVigencia', '1')
+            ->where('c.IndicadorVigencia', '1')
             ->where('c.Jornal', '0')
             ->where('trab.Nombres', 'like', '%' . $busqueda . '%')
             ->get();
