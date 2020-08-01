@@ -36,6 +36,7 @@ class Contrato extends Model
             'IdOficio as oficio_id',
             'IdCuartel as cuartel_id'
         )
+        ->orderBy('IdContrato', 'DESC')
         ->get();
     }
 }
