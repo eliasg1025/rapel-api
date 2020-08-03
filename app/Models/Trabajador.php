@@ -12,13 +12,13 @@ class Trabajador extends Model
 
     protected $table = 'dbo.Trabajador';
 
-    public static function _show($dni)
+    public static function _show($dni, $activo=true)
     {
         try {
             $t =  Trabajador::where('RutTrabajador', $dni)->whereIn('IdEmpresa', ['9', '14'])->orderBy('IdTrabajador', 'DESC')->first();
 
             $alertas = AlertaTrabajador::get($dni);
-            $contrato_activo = Contrato::activo($dni);
+            $contrato_activo = Contrato::activo($dni, $activo);
 
             return [
                 'rut' => $dni,
@@ -44,17 +44,16 @@ class Trabajador extends Model
                 ],
                 'alertas' => $alertas,
                 'contrato_activo' => $contrato_activo,
-                'ultimo_contrato' => [],
             ];
         } catch (\Exception $e) {
             return false;
         }
     }
 
-    public static function _info($dni)
+    public static function _info($dni, $activo=true)
     {
         try {
-            $info = self::_show($dni);
+            $info = self::_show($dni, $activo);
 
             foreach ($info['contrato_activo'] as &$contrato_activo) {
                 $contrato_activo['oficio'] = Oficio::_show(

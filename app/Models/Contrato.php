@@ -20,12 +20,14 @@ class Contrato extends Model
         ])->get();
     }
 
-    public static function activo($rut)
+    public static function activo($rut, $activo=true)
     {
-        return self::where([
+        $where = $activo ? [
             'RutTrabajador' => $rut,
-            //'IndicadorVigencia' => '1'
-        ])
+            'IndicadorVigencia' => '1'
+        ] : ['RutTrabajador' => $rut];
+
+        return self::where($where)
         ->select(
             'IdContrato as contrato_id',
             'IdEmpresa as empresa_id',

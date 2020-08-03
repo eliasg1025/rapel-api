@@ -12,9 +12,10 @@ class TrabajadoresController extends Controller
         //
     }
 
-    public function show($dni)
+    public function show(Request $request, $dni)
     {
-        $trabajador = Trabajador::_show($dni);
+        $activo = $request->query('activo') ? filter_var($request->query('activo'), FILTER_VALIDATE_BOOLEAN) : true;
+        $trabajador = Trabajador::_show($dni, $activo);
 
         return response()->json([
             'message' => $trabajador ? 'Trabajador obtenido' : 'No se encontro trabajador',
@@ -22,9 +23,10 @@ class TrabajadoresController extends Controller
         ], $trabajador ? 200 : 404);
     }
 
-    public function info($dni)
+    public function info(Request $request, $dni)
     {
-        $trabajador = Trabajador::_info($dni);
+        $activo = $request->query('activo') ? filter_var($request->query('activo'), FILTER_VALIDATE_BOOLEAN) : true;
+        $trabajador = Trabajador::_info($dni, $activo);
 
         return response()->json([
             'message' => empty($trabajador) ? 'No se encontro trabajador' : 'Trabajador obtenido',
