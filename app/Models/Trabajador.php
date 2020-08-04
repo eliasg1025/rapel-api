@@ -73,6 +73,9 @@ class Trabajador extends Model
                     $contrato_activo['empresa_id'],
                     $contrato_activo['afp_id']
                 );
+                $contrato_activo['regimen'] = Regimen::_show(
+                    $contrato_activo['regimen_id']
+                );
                 unset($contrato_activo['cuartel_id']);
                 unset($contrato_activo['oficio_id']);
                 unset($contrato_activo['zona_id']);

@@ -15,4 +15,11 @@ class Regimen extends Model
     {
         return self::select('IdTipo as id', 'Descripcion as name')->get();
     }
+
+    public static function _show($id)
+    {
+        return self::where([
+            'IdTipo' => $id
+        ])->select('IdTipo as id', 'Descripcion as name')->first();
+    }
 }

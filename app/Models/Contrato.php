@@ -36,7 +36,8 @@ class Contrato extends Model
             'FechaTerminoC as fecha_termino_c',
             'IdAfp as afp_id',
             'IdOficio as oficio_id',
-            'IdCuartel as cuartel_id'
+            'IdCuartel as cuartel_id',
+            'IdRegimen as regimen_id'
         )
         ->orderBy('IdContrato', 'DESC')
         ->get();
