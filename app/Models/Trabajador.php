@@ -24,6 +24,7 @@ class Trabajador extends Model
                 'rut' => $dni,
                 'trabajador' => [
                     'rut' => $dni,
+                    'code' => $t->IdTrabajador,
                     'nombre' => $t->Nombre,
                     'apellido_paterno' => $t->ApellidoPaterno,
                     'apellido_materno' => $t->ApellidoMaterno,
