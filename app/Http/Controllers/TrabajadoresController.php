@@ -16,7 +16,7 @@ class TrabajadoresController extends Controller
     public function show(Request $request, $dni)
     {
         $activo = $request->query('activo') ? filter_var($request->query('activo'), FILTER_VALIDATE_BOOLEAN) : true;
-        $info_jornal = $request->query('info_jornal') ? filter_var($request->query('info_jornal'), FILTER_VALIDATE_BOOLEAN) : false;
+        $info_jornal = $request->query('jornal') ? filter_var($request->query('jornal'), FILTER_VALIDATE_BOOLEAN) : false;
 
         $trabajador = Trabajador::_show($dni, $activo, $info_jornal);
 
@@ -29,7 +29,7 @@ class TrabajadoresController extends Controller
     public function info(Request $request, $dni)
     {
         $activo = $request->query('activo') ? filter_var($request->query('activo'), FILTER_VALIDATE_BOOLEAN) : true;
-        $info_jornal = $request->query('info_jornal') ? filter_var($request->query('info_jornal'), FILTER_VALIDATE_BOOLEAN) : false;
+        $info_jornal = $request->query('jornal') ? filter_var($request->query('jornal'), FILTER_VALIDATE_BOOLEAN) : false;
 
         $trabajador = Trabajador::_info($dni, $activo, $info_jornal);
 

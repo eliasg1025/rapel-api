@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Contrato extends Model
 {
@@ -11,6 +12,11 @@ class Contrato extends Model
     protected $table = 'dbo.Contratos';
 
     public $incrementing = false;
+
+    public function zona_labor()
+    {
+        return $this->belongsTo('App\Models\ZonaLabor');
+    }
 
     public static function byTrabajador($empresa_id, $dni)
     {
@@ -47,6 +53,10 @@ class Contrato extends Model
             return $contratos;
         }
 
+        function getZonaLaborObrero() {
+
+        }
+
         function getJornal($contrato, $rut) {
             if ( $contrato->jornal == 0 ) {
                 return $contrato;
@@ -56,6 +66,20 @@ class Contrato extends Model
                 if ($ultima_actividad) {
                     $contrato->cuartel_id = $ultima_actividad[0]->cuartel_id;
                     $contrato->zona_id = $ultima_actividad[0]->zona_labor_id;
+                }
+
+                /**
+                 * Esto es suponiendo que cada representacion de cuartel en zonas 6X tenga su contraparte en zonas 5X
+                 */
+                $name = ZonaLabor::where([
+                        'IdEmpresa' => $contrato->empresa_id,
+                        'IdZona' => $contrato->zona_id
+                    ])->first()->Nombre;
+                $name = trim(explode('(', $name)[0]);
+                $zona_labor = ZonaLabor::whereIn('IdEmpresa', ['9', '14'])->where('Nombre', 'like', '%' . $name . '%')->where('Nombre', 'not like', '%OBREROS%')->first();
+                dd($zona_labor);
+                if ($zona_labor) {
+                    $contrato->zona_id = $zona_labor->IdZona;
                 }
 
                 return $contrato;
