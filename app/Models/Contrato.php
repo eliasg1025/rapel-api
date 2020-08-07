@@ -77,7 +77,7 @@ class Contrato extends Model
                     ])->first()->Nombre;
                 $name = trim(explode('(', $name)[0]);
                 $zona_labor = ZonaLabor::whereIn('IdEmpresa', ['9', '14'])->where('Nombre', 'like', '%' . $name . '%')->where('Nombre', 'not like', '%OBREROS%')->first();
-                dd($zona_labor);
+                //dd($zona_labor);
                 if ($zona_labor) {
                     $contrato->zona_id = $zona_labor->IdZona;
                 }
