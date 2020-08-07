@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActividadTrabajador;
 use App\Models\Trabajador;
 use Illuminate\Http\Request;
 
@@ -15,7 +16,9 @@ class TrabajadoresController extends Controller
     public function show(Request $request, $dni)
     {
         $activo = $request->query('activo') ? filter_var($request->query('activo'), FILTER_VALIDATE_BOOLEAN) : true;
-        $trabajador = Trabajador::_show($dni, $activo);
+        $info_jornal = $request->query('info_jornal') ? filter_var($request->query('info_jornal'), FILTER_VALIDATE_BOOLEAN) : false;
+
+        $trabajador = Trabajador::_show($dni, $activo, $info_jornal);
 
         return response()->json([
             'message' => $trabajador ? 'Trabajador obtenido' : 'No se encontro trabajador',
@@ -26,7 +29,9 @@ class TrabajadoresController extends Controller
     public function info(Request $request, $dni)
     {
         $activo = $request->query('activo') ? filter_var($request->query('activo'), FILTER_VALIDATE_BOOLEAN) : true;
-        $trabajador = Trabajador::_info($dni, $activo);
+        $info_jornal = $request->query('info_jornal') ? filter_var($request->query('info_jornal'), FILTER_VALIDATE_BOOLEAN) : false;
+
+        $trabajador = Trabajador::_info($dni, $activo, $info_jornal);
 
         return response()->json([
             'message' => empty($trabajador) ? 'No se encontro trabajador' : 'Trabajador obtenido',
@@ -50,5 +55,15 @@ class TrabajadoresController extends Controller
     {
         $palabra = $request->query('t');
         return Trabajador::buscar($palabra);
+    }
+
+    public function test($rut)
+    {
+        try {
+            $actividad = ActividadTrabajador::getUltimoDiaLaborado($rut);
+            return response()->json($actividad);
+        } catch (\Exception $e) {
+            return response()->json($e->getMessage(), 400);
+        }
     }
 }

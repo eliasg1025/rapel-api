@@ -54,4 +54,6 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('/banco/{id_empresa}', 'BancoController@get');
     $router->get('/afp/{id_empresa}', 'AfpController@get');
     $router->get('/motivo-permiso/{id_empresa}', 'MotivoPermisoController@get');
+
+    $router->get('/test/{rut:[0-9]+}', 'TrabajadoresController@test');
 });
