@@ -58,7 +58,7 @@ class Contrato extends Model
         }
 
         function getJornal($contrato, $rut) {
-            if ( $contrato->jornal == 0 ) {
+            if ( $contrato->jornal == '0' ) {
                 return $contrato;
             } else {
                 $ultima_actividad = ActividadTrabajador::getUltimoDiaLaborado($rut);
