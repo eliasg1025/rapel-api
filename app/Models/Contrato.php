@@ -58,30 +58,35 @@ class Contrato extends Model
             if ( $contrato->jornal == '0' ) {
                 return $contrato;
             } else {
-                $ultima_actividad = ActividadTrabajador::getUltimoDiaLaborado($rut);
+                try {
+                    $ultima_actividad = ActividadTrabajador::getUltimoDiaLaborado($rut);
 
-                if ( $ultima_actividad ) {
-                    if ( Carbon::parse($ultima_actividad[0]->fecha_actividad)->diffInDays(Carbon::now()) <= 2 ) {
-                        $contrato->cuartel_id = $ultima_actividad[0]->cuartel_id;
-                        $contrato->zona_id = $ultima_actividad[0]->zona_labor_id;
+                    if ( $ultima_actividad ) {
+                        if ( Carbon::parse($ultima_actividad[0]->fecha_actividad)->diffInDays(Carbon::now()) <= 2 ) {
+                            $contrato->cuartel_id = $ultima_actividad[0]->cuartel_id;
+                            $contrato->zona_id = $ultima_actividad[0]->zona_labor_id;
+                        }
                     }
-                }
 
-                /**
-                 * Esto es suponiendo que cada representacion de cuartel en zonas 6X tenga su contraparte en zonas 5X
-                 */
-                $name = ZonaLabor::where([
+                    /**
+                     * Esto es suponiendo que cada representacion de cuartel en zonas 6X tenga su contraparte en zonas 5X
+                     */
+                    $name = ZonaLabor::where([
                         'IdEmpresa' => $contrato->empresa_id,
                         'IdZona' => $contrato->zona_id
                     ])->first()->Nombre;
-                $name = trim(explode('(', $name)[0]);
-                $zona_labor = ZonaLabor::whereIn('IdEmpresa', ['9', '14'])->where('Nombre', 'like', '%' . $name . '%')->where('Nombre', 'not like', '%OBREROS%')->first();
-                //dd($zona_labor);
-                if ($zona_labor) {
-                    $contrato->zona_id = $zona_labor->IdZona;
-                }
 
-                return $contrato;
+                    $name = trim(explode('(', $name)[0]);
+                    //dd($name);
+                    $zona_labor = ZonaLabor::whereIn('IdEmpresa', ['9', '14'])->where('Nombre', 'like', '%' . $name . '%')->where('Nombre', 'not like', '%OBREROS%')->first();
+                    if ($zona_labor) {
+                        $contrato->zona_id = $zona_labor->IdZona;
+                    }
+
+                    return $contrato;
+                } catch (\Exception $e) {
+                    return $contrato;
+                }
             }
         }
 
