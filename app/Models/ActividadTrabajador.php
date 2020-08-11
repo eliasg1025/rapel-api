@@ -19,7 +19,7 @@ class ActividadTrabajador extends Model
             ->where([
                 'RutTrabajador' => $rut,
             ])
-            ->select('IdZona as zona_labor_id', 'IdCuartel as cuartel_id')
+            ->select('IdZona as zona_labor_id', 'IdCuartel as cuartel_id', 'FechaActividad as fecha_actividad')
             ->orderBy('FechaActividad', 'DESC')
             ->get()->toArray();
     }

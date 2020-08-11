@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -53,19 +54,17 @@ class Contrato extends Model
             return $contratos;
         }
 
-        function getZonaLaborObrero() {
-
-        }
-
         function getJornal($contrato, $rut) {
             if ( $contrato->jornal == '0' ) {
                 return $contrato;
             } else {
                 $ultima_actividad = ActividadTrabajador::getUltimoDiaLaborado($rut);
 
-                if ($ultima_actividad) {
-                    $contrato->cuartel_id = $ultima_actividad[0]->cuartel_id;
-                    $contrato->zona_id = $ultima_actividad[0]->zona_labor_id;
+                if ( $ultima_actividad ) {
+                    if ( Carbon::parse($ultima_actividad[0]->fecha_actividad)->diffInDays(Carbon::now()) <= 2 ) {
+                        $contrato->cuartel_id = $ultima_actividad[0]->cuartel_id;
+                        $contrato->zona_id = $ultima_actividad[0]->zona_labor_id;
+                    }
                 }
 
                 /**
