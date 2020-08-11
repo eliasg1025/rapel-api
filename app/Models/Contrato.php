@@ -47,7 +47,7 @@ class Contrato extends Model
                 'IdCuartel as cuartel_id',
                 'IdRegimen as regimen_id'
             )
-            ->orderBy('FechaInicioPeriodo', 'DESC')
+            ->orderBy('FechaInicio', 'DESC')
             ->get();
 
         if ($info_jornal == false) {
