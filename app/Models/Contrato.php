@@ -37,6 +37,7 @@ class Contrato extends Model
         $contratos = self::where($where)
             ->select(
                 'IdContrato as contrato_id',
+                'IdTrabajador as trabajador_code',
                 'IdEmpresa as empresa_id',
                 'FechaInicioPeriodo as fecha_inicio',
                 'IdZona as zona_id',

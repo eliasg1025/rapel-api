@@ -24,7 +24,7 @@ class Trabajador extends Model
                 'rut' => $dni,
                 'trabajador' => [
                     'rut' => $dni,
-                    'code' => $t->IdTrabajador,
+                    'code' => $contrato_activo[0]->trabajador_code,
                     'nombre' => $t->Nombre,
                     'apellido_paterno' => $t->ApellidoPaterno,
                     'apellido_materno' => $t->ApellidoMaterno,
@@ -39,7 +39,7 @@ class Trabajador extends Model
                     'distrito_id' => $t->COD_COM,
                     'estado_civil_id' => $t->EstadoCivil,
                     'nacionalidad_id' => $t->IdNacionalidad,
-                    'empresa_id' => $t->IdEmpresa,
+                    'empresa_id' => $contrato_activo[0]->empresa_id,
                     'numero_cuenta' => $t->NumeroCuentaBancaria,
                     'banco_id' => $t->IdBanco
                 ],
