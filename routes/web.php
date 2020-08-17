@@ -55,5 +55,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('/afp/{id_empresa}', 'AfpController@get');
     $router->get('/motivo-permiso/{id_empresa}', 'MotivoPermisoController@get');
 
+    $router->get('/finiquitos/exportar', 'LiquidacionController@exportar');
+
     $router->get('/test/{rut:[0-9]+}', 'TrabajadoresController@test');
 });
