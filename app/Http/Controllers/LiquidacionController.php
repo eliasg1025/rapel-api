@@ -40,6 +40,7 @@ class LiquidacionController extends Controller
                     'RutTrabajador',
                     'Mes',
                     'Ano',
+                    'FechaEmision',
                     DB::raw("CAST(ROUND(MontoAPagar, 2, 0) as decimal(18, 2)) MontoAPagar")
                 )->whereIn('IdEmpresa', [9, 14])->where('IdFiniquito', '<>', '0')
                     ->whereDate('FechaEmision', '>=', $desde)->whereDate('FechaEmision', '<=', $hasta)->cursor()
