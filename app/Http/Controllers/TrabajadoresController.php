@@ -39,6 +39,20 @@ class TrabajadoresController extends Controller
         ], empty($trabajador) ? 404 : 200);
     }
 
+    public function infoPeriodos(Request $request, $dni)
+    {
+        $result = Trabajador::infoPeriodos($dni);
+
+        if ( isset($result['error']) ) {
+            return response()->json([
+                'message' => 'Error al obtener trabajador',
+                'error' => $result['error']
+            ], 400);
+        }
+
+        return response()->json($result);
+    }
+
     public function revision(Request $request)
     {
         $result = Trabajador::revision($request->trabajadores);

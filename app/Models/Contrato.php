@@ -27,6 +27,44 @@ class Contrato extends Model
         ])->get();
     }
 
+    public static function byPeriodo($rut)
+    {
+        $contratos = DB::table('dbo.Contratos as c')
+            ->select(
+                'c.IdEmpresa as empresa_id',
+                'Periodo as periodo',
+                'IdContrato as contrato_id',
+                'IndicadorVigencia as indicador_vigencia',
+                DB::raw('CAST(ROUND(c.SueldoBase * 1.2638, 2, 0) as decimal(18, 2)) sueldo_bruto'),
+                're.Descripcion as regimen',
+                'z.Nombre as zona_labor',
+                'o.Descripcion as oficio',
+                'FechaInicio as fecha_inicio',
+                'FechaTerminoC as fecha_termino_c',
+                'FechaInicioPeriodo as fecha_inicio_periodo',
+                'FechaTermino as fecha_termino',
+                DB::raw('DATEDIFF(MONTH, c.FechaInicioPeriodo, c.FechaTermino) as meses')
+            )
+            ->join('dbo.TipoRegimen as re', 're.IdTipo', '=', 'c.IdRegimen')
+            ->join('dbo.Oficio as o', [
+                'o.IdOficio' => 'c.IdOficio',
+                'o.IdEmpresa' => 'c.IdEmpresa'
+            ])
+            ->join('dbo.Zona as z', [
+                'z.IdZona' => 'c.IdZona',
+                'z.IdEmpresa' => 'c.IdEmpresa'
+            ])
+            ->where('RutTrabajador', $rut)
+            ->where(function($query) {
+                $query->whereNotNull('c.FechaTermino')
+                    ->orWhere('c.IndicadorVigencia', '1');
+            })
+            ->orderBy('c.FechaInicio', 'DESC')
+            ->get();
+
+        return $contratos;
+    }
+
     public static function activo($rut, $activo=true, $info_jornal=false)
     {
         $where = $activo ? [

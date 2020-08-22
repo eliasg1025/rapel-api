@@ -88,6 +88,46 @@ class Trabajador extends Model
         }
     }
 
+    public static function infoPeriodos($dni)
+    {
+        try {
+            $trabajador = DB::table('dbo.Trabajador as t')
+                ->select(
+                    't.RutTrabajador as rut',
+                    't.Nombre as nombre',
+                    't.ApellidoPaterno as apellido_paterno',
+                    't.ApellidoMaterno as apellido_materno',
+                    DB::raw('CONVERT(varchar, t.FechaNacimiento, 23) fecha_nacimiento'),
+                    DB::raw('DATEDIFF(YEAR, t.FechaNacimiento, GETDATE()) as edad'),
+                    't.Sexo as sexo',
+                    't.Direccion as direccion',
+                    't.COD_COM as distrito_id',
+                    't.EstadoCivil as estado_civil',
+                    'n.Descripcion as nacionalidad'
+                )
+                ->join('dbo.Nacionalidad as n', [
+                    'n.IdEmpresa' => 't.IdEmpresa',
+                    'n.IdNacionalidad' => 't.IdNacionalidad'
+                ])
+                ->where('RutTrabajador', $dni)
+                ->whereIn('t.IdEmpresa', ['9', '14'])
+                ->first();
+            $alertas = AlertaTrabajador::get($dni);
+            $contratos = Contrato::byPeriodo($dni);
+
+            return [
+                'rut' => $dni,
+                'trabajador' => $trabajador,
+                'alertas' => $alertas,
+                'periodos' => $contratos
+            ];
+        } catch (\Exception $e) {
+            return [
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+
     public static function buscar(string $busqueda)
     {
         $trabajadores = DB::table('dbo.Trabajador as t')
