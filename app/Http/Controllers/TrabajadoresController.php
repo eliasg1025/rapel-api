@@ -43,6 +43,13 @@ class TrabajadoresController extends Controller
     {
         $result = Trabajador::infoPeriodos($dni);
 
+        if ( isset($result['error']) ) {
+            return response()->json([
+                'message' => 'Error al obtener trabajador',
+                'error' => $result['error']
+            ], 400);
+        }
+
         if (is_null($result['trabajador'])) {
             return response()->json([
                 'message' => 'Trabajador no encontrado',
@@ -50,12 +57,6 @@ class TrabajadoresController extends Controller
             ], 404);
         }
 
-        if ( isset($result['error']) ) {
-            return response()->json([
-                'message' => 'Error al obtener trabajador',
-                'error' => $result['error']
-            ], 400);
-        }
 
         return response()->json($result);
     }

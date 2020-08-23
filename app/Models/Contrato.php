@@ -39,10 +39,13 @@ class Contrato extends Model
                 're.Descripcion as regimen',
                 'z.Nombre as zona_labor',
                 'o.Descripcion as oficio',
+                'i.Texto as inciso',
                 'FechaInicio as fecha_inicio',
                 'FechaTerminoC as fecha_termino_c',
                 'FechaInicioPeriodo as fecha_inicio_periodo',
                 'FechaTermino as fecha_termino',
+                DB::raw('CONVERT(varchar, FechaInicioPeriodo, 23) desde'),
+                DB::raw('CONVERT(varchar, FechaTermino, 23) hasta'),
                 DB::raw('DATEDIFF(MONTH, c.FechaInicioPeriodo, c.FechaTermino) as meses')
             )
             ->join('dbo.TipoRegimen as re', 're.IdTipo', '=', 'c.IdRegimen')
@@ -53,6 +56,10 @@ class Contrato extends Model
             ->join('dbo.Zona as z', [
                 'z.IdZona' => 'c.IdZona',
                 'z.IdEmpresa' => 'c.IdEmpresa'
+            ])
+            ->leftJoin('dbo.Inciso as i', [
+                'i.IdArticulo' => 'c.IdArticulo',
+                'i.IdInciso' => 'c.IdInciso'
             ])
             ->where('RutTrabajador', $rut)
             ->where(function($query) {
