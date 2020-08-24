@@ -171,21 +171,16 @@ class Trabajador extends Model
 
         return DB::table('dbo.Trabajador as t')
             ->select(
-                't.IdTrabajador as id',
                 't.RutTrabajador as rut',
-                'c.IdEmpresa as empresa_id',
                 'trab.Nombres as nombre_completo',
             )
-            ->join('dbo.Contratos as c', [
-                'c.IdEmpresa'     => 't.IdEmpresa',
-                'c.RutTrabajador' => 't.RutTrabajador'
-            ])
             ->joinSub($trabajadores, 'trab', function($join) {
                 $join->on('trab.IdTrabajador', '=', 't.IdTrabajador')
                 ->on('trab.IdEmpresa', '=', 't.IdEmpresa');
             })
-            ->whereIn('c.IdEmpresa', [9, 14])
+            ->whereIn('t.IdEmpresa', [9, 14])
             ->where('trab.Nombres', 'like', '%' . $busqueda . '%')
+            ->distinct()
             ->get();
     }
 
