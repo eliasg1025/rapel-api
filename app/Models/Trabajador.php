@@ -166,7 +166,7 @@ class Trabajador extends Model
             ->select(
                 't.IdTrabajador',
                 't.IdEmpresa',
-                DB::raw("(cast (t.Nombre as varchar) + cast(' ' as varchar) + cast(t.ApellidoPaterno as varchar) + cast(' ' as varchar) + cast(t.ApellidoMaterno as varchar)) as Nombres")
+                DB::raw("(cast(t.ApellidoPaterno as varchar) + cast(' ' as varchar) + cast(t.ApellidoMaterno as varchar) + cast(' ' as varchar) + cast (t.Nombre as varchar)) as Nombres")
             );
 
         return DB::table('dbo.Trabajador as t')
