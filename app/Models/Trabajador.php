@@ -160,6 +160,35 @@ class Trabajador extends Model
             ->get();
     }
 
+    public static function buscarTodos(string $busqueda)
+    {
+        $trabajadores = DB::table('dbo.Trabajador as t')
+            ->select(
+                't.IdTrabajador',
+                't.IdEmpresa',
+                DB::raw("(cast (t.Nombre as varchar) + cast(' ' as varchar) + cast(t.ApellidoPaterno as varchar) + cast(' ' as varchar) + cast(t.ApellidoMaterno as varchar)) as Nombres")
+            );
+
+        return DB::table('dbo.Trabajador as t')
+            ->select(
+                't.IdTrabajador as id',
+                't.RutTrabajador as rut',
+                'c.IdEmpresa as empresa_id',
+                'trab.Nombres as nombre_completo',
+            )
+            ->join('dbo.Contratos as c', [
+                'c.IdEmpresa'     => 't.IdEmpresa',
+                'c.RutTrabajador' => 't.RutTrabajador'
+            ])
+            ->joinSub($trabajadores, 'trab', function($join) {
+                $join->on('trab.IdTrabajador', '=', 't.IdTrabajador')
+                ->on('trab.IdEmpresa', '=', 't.IdEmpresa');
+            })
+            ->whereIn('c.IdEmpresa', [9, 14])
+            ->where('trab.Nombres', 'like', '%' . $busqueda . '%')
+            ->get();
+    }
+
     public static function revision(array $trabajadores=[], $con_trabajador=true)
     {
         $registrados = [];

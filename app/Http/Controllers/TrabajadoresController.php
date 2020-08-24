@@ -79,6 +79,12 @@ class TrabajadoresController extends Controller
         return Trabajador::buscar($palabra);
     }
 
+    public function buscarTodos(Request $request)
+    {
+        $palabra = $request->query('t');
+        return Trabajador::buscarTodos($palabra);
+    }
+
     public function test($rut)
     {
         try {

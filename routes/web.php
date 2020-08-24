@@ -23,6 +23,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('/trabajador/{dni:[0-9]+}', 'TrabajadoresController@show');
     $router->get('/trabajador/{dni:[0-9]+}/info', 'TrabajadoresController@info');
     $router->get('/trabajador/buscar', 'TrabajadoresController@buscar');
+    $router->get('/trabajador/buscar-todos', 'TrabajadoresController@buscarTodos');
     $router->post('/trabajador/revision', 'TrabajadoresController@revision');
     $router->post('/trabajador/revision/sin-trabajadores', 'TrabajadoresController@revisionSinTrabajadores');
     $router->get('/departamento', 'DepartamentosController@get');
