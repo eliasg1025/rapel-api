@@ -129,8 +129,15 @@ class Trabajador extends Model
         }
     }
 
-    public static function getTrabajadoresSctr($empresa_id, $oficios_indexes, $info_cuarteles)
+    public static function getTrabajadoresSctr($empresa_id, $oficios_indexes, $cuarteles_indexes)
     {
+        $condicion = "(cast(c.IdZona as varchar) + '@' + cast(c.IdCuartel as varchar)) in (";
+        for ($i=1; $i <= sizeof($cuarteles_indexes); $i++) {
+            $condicion .= '?,';
+        }
+        $condicion = substr($condicion, 0, -1);
+        $condicion .= ')';
+
 
         $trabajadores = DB::table('dbo.Trabajador as t')
             ->select(
@@ -155,9 +162,16 @@ class Trabajador extends Model
                 'o.IdOficio' => 'c.IdOficio'
             ])
             ->where('c.IndicadorVigencia', true)
-            ->where(function($query) use ($empresa_id, $oficios_indexes) {
-                $query->where('c.IdEmpresa', $empresa_id)
-                    ->whereIn('c.IdOficio', $oficios_indexes);
+            ->where(function($query) use ($empresa_id, $oficios_indexes, $condicion, $cuarteles_indexes) {
+                $query
+                    ->where(function($query) use ($empresa_id, $oficios_indexes) {
+                        $query->where('c.IdEmpresa', $empresa_id)
+                            ->whereIn('c.IdOficio', $oficios_indexes);
+                    })
+                    ->orWhere(function($query) use ($empresa_id, $condicion, $cuarteles_indexes) {
+                        $query->where('c.IdEmpresa', $empresa_id)
+                            ->whereRaw($condicion, $cuarteles_indexes);
+                    });
             })
             ->orderBy('t.ApellidoPaterno', 'ASC')
             ->get();
