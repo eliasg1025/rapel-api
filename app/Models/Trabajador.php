@@ -103,6 +103,7 @@ class Trabajador extends Model
                     't.Direccion as direccion',
                     't.COD_COM as distrito_id',
                     't.EstadoCivil as estado_civil',
+                    't.Telefono as telefono',
                     'n.Descripcion as nacionalidad'
                 )
                 ->join('dbo.Nacionalidad as n', [
