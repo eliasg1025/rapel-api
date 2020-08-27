@@ -26,6 +26,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('/trabajador/buscar-todos', 'TrabajadoresController@buscarTodos');
     $router->post('/trabajador/revision', 'TrabajadoresController@revision');
     $router->post('/trabajador/revision/sin-trabajadores', 'TrabajadoresController@revisionSinTrabajadores');
+    $router->post('/planilla/sctr/{empresa_id}', 'TrabajadoresController@getTrabajadoresSctr');
     $router->get('/departamento', 'DepartamentosController@get');
     $router->get('/departamento/{codigo}', 'DepartamentosController@show');
     $router->get('/departamento/{codigo}/provincias', 'DepartamentosController@provincias');

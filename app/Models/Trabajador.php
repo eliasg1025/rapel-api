@@ -129,6 +129,42 @@ class Trabajador extends Model
         }
     }
 
+    public static function getTrabajadoresSctr($empresa_id, $oficios_indexes, $info_cuarteles)
+    {
+
+        $trabajadores = DB::table('dbo.Trabajador as t')
+            ->select(
+                't.RutTrabajador as key',
+                't.ApellidoPaterno as apellido_paterno',
+                't.ApellidoMaterno as apellido_materno',
+                't.Nombre as nombres',
+                't.Sexo as sexo',
+                DB::raw('CONVERT(varchar, t.FechaNacimiento, 103) fecha_nacimiento'),
+                't.IdTipoDctoIden as tipo_documento',
+                't.RutTrabajador as rut',
+                'o.Descripcion as cargo',
+                DB::raw('CAST(ROUND(c.SueldoBase * 1.2638, 2, 0) as decimal(18, 2)) sueldo'),
+                DB::raw('CONVERT(varchar, c.FechaInicioPeriodo, 103) fecha_ingreso')
+            )
+            ->join('dbo.Contratos as c', [
+                'c.IdEmpresa' => 't.IdEmpresa',
+                'c.RutTrabajador' => 't.RutTrabajador'
+            ])
+            ->join('dbo.Oficio as o', [
+                'o.IdEmpresa' => 'c.IdEmpresa',
+                'o.IdOficio' => 'c.IdOficio'
+            ])
+            ->where('c.IndicadorVigencia', true)
+            ->where(function($query) use ($empresa_id, $oficios_indexes) {
+                $query->where('c.IdEmpresa', $empresa_id)
+                    ->whereIn('c.IdOficio', $oficios_indexes);
+            })
+            ->orderBy('t.ApellidoPaterno', 'ASC')
+            ->get();
+
+        return $trabajadores;
+    }
+
     public static function buscar(string $busqueda)
     {
         $trabajadores = DB::table('dbo.Trabajador as t')

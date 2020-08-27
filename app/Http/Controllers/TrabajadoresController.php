@@ -61,6 +61,13 @@ class TrabajadoresController extends Controller
         return response()->json($result);
     }
 
+    public function getTrabajadoresSctr(Request $request, $empresa_id)
+    {
+        $result = Trabajador::getTrabajadoresSctr($empresa_id, $request->get('oficios'), $request->get('cuarteles'));
+
+        return response()->json($result);
+    }
+
     public function revision(Request $request)
     {
         $result = Trabajador::revision($request->trabajadores);
