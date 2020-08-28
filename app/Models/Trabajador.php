@@ -150,7 +150,7 @@ class Trabajador extends Model
                 't.IdTipoDctoIden as tipo_documento',
                 't.RutTrabajador as rut',
                 'o.Descripcion as cargo',
-                DB::raw('CAST(ROUND(c.SueldoBase * 1.2638, 2, 0) as decimal(18, 2)) sueldo'),
+                DB::raw('CASE WHEN c.IdTipo = 2 THEN CAST(ROUND(c.SueldoBase * 1.2638, 2, 0) AS DECIMAL(18, 2)) ELSE CAST(ROUND( c.SueldoBase, 2, 0) AS DECIMAL(18, 2)) END AS sueldo'),
                 DB::raw('CONVERT(varchar, c.FechaInicioPeriodo, 103) fecha_ingreso')
             )
             ->join('dbo.Contratos as c', [
