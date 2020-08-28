@@ -63,7 +63,9 @@ class TrabajadoresController extends Controller
 
     public function getTrabajadoresSctr(Request $request, $empresa_id)
     {
-        $result = Trabajador::getTrabajadoresSctr($empresa_id, $request->get('oficios'), $request->get('cuarteles'));
+        $fechas = $request->get('fechas');
+        $actual = $request->get('actual');
+        $result = Trabajador::getTrabajadoresSctr($empresa_id, $request->get('oficios'), $request->get('cuarteles'), $actual, $fechas);
 
         return response()->json($result);
     }

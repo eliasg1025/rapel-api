@@ -129,7 +129,7 @@ class Trabajador extends Model
         }
     }
 
-    public static function getTrabajadoresSctr($empresa_id, $oficios_indexes, $cuarteles_indexes)
+    public static function getTrabajadoresSctr($empresa_id, $oficios_indexes, $cuarteles_indexes, $actual, $fechas)
     {
         $condicion = "(cast(c.IdZona as varchar) + '@' + cast(c.IdCuartel as varchar)) in (";
         for ($i=1; $i <= sizeof($cuarteles_indexes); $i++) {
@@ -137,7 +137,6 @@ class Trabajador extends Model
         }
         $condicion = substr($condicion, 0, -1);
         $condicion .= ')';
-
 
         $trabajadores = DB::table('dbo.Trabajador as t')
             ->select(
@@ -150,7 +149,17 @@ class Trabajador extends Model
                 't.IdTipoDctoIden as tipo_documento',
                 't.RutTrabajador as rut',
                 'o.Descripcion as cargo',
-                DB::raw('CASE WHEN c.IdTipo = 2 THEN CAST(ROUND(c.SueldoBase * 1.2638, 2, 0) AS DECIMAL(18, 2)) ELSE CAST(ROUND( c.SueldoBase, 2, 0) AS DECIMAL(18, 2)) END AS sueldo'),
+                'c.IdRegimen as regimen_id',
+                DB::raw('
+                    CASE
+                        WHEN c.IdRegimen = 2
+                            THEN CAST(ROUND(c.SueldoBase, 2, 0) as decimal(18, 2))
+                        WHEN c.IdRegimen = 3
+                            THEN CAST(ROUND(c.SueldoBase * 1.2638 * 30, 2, 0) as decimal(18, 2))
+                        ELSE
+                            CAST(ROUND(c.SueldoBase * 1.2638, 2, 0) as decimal(18, 2))
+                    END AS sueldo
+                '),
                 DB::raw('CONVERT(varchar, c.FechaInicioPeriodo, 103) fecha_ingreso')
             )
             ->join('dbo.Contratos as c', [
@@ -162,6 +171,14 @@ class Trabajador extends Model
                 'o.IdOficio' => 'c.IdOficio'
             ])
             ->where('c.IndicadorVigencia', true)
+            ->whereNull('c.FechaTermino')
+            ->when($actual, function($query) {
+                $query->whereDate('c.FechaInicioPeriodo', '<=', Carbon::now()->lastOfMonth());
+            })
+            ->when(!$actual, function($query) use ($fechas) {
+                $query->whereDate('c.FechaInicioPeriodo', '>=', Carbon::parse($fechas['desde']))
+                    ->whereDate('c.FechaInicioPeriodo', '<=', Carbon::parse($fechas['hasta']));
+            })
             ->where(function($query) use ($empresa_id, $oficios_indexes, $condicion, $cuarteles_indexes) {
                 $query
                     ->where(function($query) use ($empresa_id, $oficios_indexes) {
