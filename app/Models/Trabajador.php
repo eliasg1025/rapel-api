@@ -114,7 +114,7 @@ class Trabajador extends Model
                 ->whereIn('t.IdEmpresa', ['9', '14'])
                 ->first();
 
-            $contrato_activo = Contrato::activo($dni);
+            $contrato_activo = self::_info($dni)['contrato_activo'];
 
             return [
                 'rut' => $dni,
