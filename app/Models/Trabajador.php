@@ -187,7 +187,14 @@ class Trabajador extends Model
                 't.Sexo as sexo',
                 DB::raw('CONVERT(varchar, t.FechaNacimiento, 103) fecha_nacimiento'),
                 't.IdTipoDctoIden as tipo_documento',
-                't.RutTrabajador as rut',
+                DB::raw("
+                    CASE
+                        WHEN t.IdTipoDctoIden = 1
+                            THEN RIGHT('000000' + CAST(t.RutTrabajador as varchar), 8)
+                        ELSE
+                            RIGHT('000000' + CAST(t.RutTrabajador as varchar), 9)
+                    END AS rut
+                "),
                 'o.Descripcion as cargo',
                 'c.IdRegimen as regimen_id',
                 DB::raw('
