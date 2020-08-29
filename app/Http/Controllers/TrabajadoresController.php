@@ -61,6 +61,27 @@ class TrabajadoresController extends Controller
         return response()->json($result);
     }
 
+    public function infoSctr($dni)
+    {
+        $result = Trabajador::infoSctr($dni);
+
+        if ( isset($result['error']) ) {
+            return response()->json([
+                'message' => 'Error al obtener trabajador',
+                'error' => $result['error']
+            ], 400);
+        }
+
+        if (is_null($result['trabajador'])) {
+            return response()->json([
+                'message' => 'Trabajador no encontrado',
+                'error' => 'Trabajador no encontrado'
+            ], 404);
+        }
+
+        return response()->json($result);
+    }
+
     public function getTrabajadoresSctr(Request $request, $empresa_id)
     {
         $fechas = $request->get('fechas');
