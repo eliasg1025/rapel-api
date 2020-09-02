@@ -54,4 +54,15 @@ class LiquidacionController extends Controller
 
         return (new FastExcel($finiquitos))->download('finquitos.csv');
     }
+
+    public function get(Request $request)
+    {
+        $desde = Carbon::parse($request->query('desde'));
+        $hasta = Carbon::parse($request->query('hasta'))->lastOfMonth();
+        $empresa_id = $request->query('empresa_id');
+
+        $result = Liquidacion::get($empresa_id, $desde, $hasta);
+
+        return $result;
+    }
 }
