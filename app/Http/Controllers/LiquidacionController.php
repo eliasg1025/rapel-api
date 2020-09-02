@@ -42,7 +42,9 @@ class LiquidacionController extends Controller
                         'l.Mes',
                         'l.Ano',
                         'l.FechaEmision',
-                        DB::raw("CAST(ROUND(l.MontoAPagar, 2, 0) as decimal(18, 2)) MontoAPagar")
+                        DB::raw("CAST(ROUND(l.MontoAPagar, 2, 0) as decimal(18, 2)) MontoAPagar"),
+                        't.IdBanco',
+                        't.NumeroCuentaBancaria'
                     )
                     ->join('dbo.Trabajador as t', [
                         't.IdEmpresa' => 'l.IdEmpresa',
