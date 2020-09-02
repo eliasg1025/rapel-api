@@ -59,7 +59,7 @@ class LiquidacionController extends Controller
     {
         $desde = Carbon::parse($request->query('desde'));
         $hasta = Carbon::parse($request->query('hasta'))->lastOfMonth();
-        $empresa_id = $request->query('empresa_id');
+        $empresa_id = (int) $request->query('empresa_id');
 
         $result = Liquidacion::get($empresa_id, $desde, $hasta);
 

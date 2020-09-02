@@ -14,7 +14,7 @@ class Liquidacion extends Model
 
     public $incrementing = false;
 
-    public static function get($empresa_id, $desde, $hasta)
+    public static function get(int $empresa_id, $desde, $hasta)
     {
         $finiquitos = Liquidacion::select(
             'IdLiquidacion',
@@ -26,8 +26,14 @@ class Liquidacion extends Model
             'FechaEmision',
             DB::raw("CAST(ROUND(MontoAPagar, 2, 0) as decimal(18, 2)) MontoAPagar")
         )
-            ->where('IdEmpresa', $empresa_id)->where('IdFiniquito', '<>', '0')
+            ->where('IdFiniquito', '<>', '0')
             ->whereDate('FechaEmision', '>=', $desde)->whereDate('FechaEmision', '<=', $hasta)
+            ->when($empresa_id === 0, function($query) {
+                $query->whereIn('IdEmpresa', [9, 14]);
+            })
+            ->when($empresa_id !== 0, function($query) use ($empresa_id) {
+                $query->where('IdEmpresa', $empresa_id);
+            })
             ->get();
 
         return $finiquitos;
