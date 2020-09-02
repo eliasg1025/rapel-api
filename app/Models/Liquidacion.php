@@ -16,23 +16,30 @@ class Liquidacion extends Model
 
     public static function get(int $empresa_id, $desde, $hasta)
     {
-        $finiquitos = Liquidacion::select(
-            'IdLiquidacion',
-            'IdFiniquito',
-            'IdEmpresa',
-            'RutTrabajador',
-            'Mes',
-            'Ano',
-            'FechaEmision',
-            DB::raw("CAST(ROUND(MontoAPagar, 2, 0) as decimal(18, 2)) MontoAPagar")
-        )
-            ->where('IdFiniquito', '<>', '0')
-            ->whereDate('FechaEmision', '>=', $desde)->whereDate('FechaEmision', '<=', $hasta)
+        $finiquitos = DB::table('dbo.Liquidacion as l')
+            ->select(
+                'l.IdLiquidacion',
+                'l.IdFiniquito',
+                'l.IdEmpresa',
+                'l.RutTrabajador',
+                'l.Mes',
+                'l.Ano',
+                'l.FechaEmision',
+                DB::raw("CAST(ROUND(l.MontoAPagar, 2, 0) as decimal(18, 2)) MontoAPagar"),
+                't.IdBanco',
+                't.NumeroCuentaBancaria'
+            )
+            ->join('dbo.Trabajador as t', [
+                't.IdEmpresa' => 'l.IdEmpresa',
+                'l.RutTrabajador' => 't.RutTrabajador'
+            ])
+            ->where('l.IdFiniquito', '<>', '0')
+            ->whereDate('l.FechaEmision', '>=', $desde)->whereDate('l.FechaEmision', '<=', $hasta)
             ->when($empresa_id === 0, function($query) {
-                $query->whereIn('IdEmpresa', [9, 14]);
+                $query->whereIn('l.IdEmpresa', [9, 14]);
             })
             ->when($empresa_id !== 0, function($query) use ($empresa_id) {
-                $query->where('IdEmpresa', $empresa_id);
+                $query->where('l.IdEmpresa', $empresa_id);
             })
             ->get();
 

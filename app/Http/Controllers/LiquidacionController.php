@@ -33,17 +33,24 @@ class LiquidacionController extends Controller
 
         function finiquitosGenerator($desde, $hasta) {
             foreach (
-                Liquidacion::select(
-                    'IdLiquidacion',
-                    'IdFiniquito',
-                    'IdEmpresa',
-                    'RutTrabajador',
-                    'Mes',
-                    'Ano',
-                    'FechaEmision',
-                    DB::raw("CAST(ROUND(MontoAPagar, 2, 0) as decimal(18, 2)) MontoAPagar")
-                )->whereIn('IdEmpresa', [9, 14])->where('IdFiniquito', '<>', '0')
-                    ->whereDate('FechaEmision', '>=', $desde)->whereDate('FechaEmision', '<=', $hasta)->cursor()
+                DB::table('dbo.Liquidacion as l')
+                    ->select(
+                        'l.IdLiquidacion',
+                        'l.IdFiniquito',
+                        'l.IdEmpresa',
+                        'l.RutTrabajador',
+                        'l.Mes',
+                        'l.Ano',
+                        'l.FechaEmision',
+                        DB::raw("CAST(ROUND(l.MontoAPagar, 2, 0) as decimal(18, 2)) MontoAPagar")
+                    )
+                    ->join('dbo.Trabajador as t', [
+                        't.IdEmpresa' => 'l.IdEmpresa',
+                        't.RutTrabajador' => 'l.RutTrabajador'
+                    ])
+                    ->whereIn('l.IdEmpresa', [9, 14])->where('l.IdFiniquito', '<>', '0')
+                    ->whereDate('l.FechaEmision', '>=', $desde)->whereDate('l.FechaEmision', '<=', $hasta)
+                    ->cursor()
                 as $finiquito
             ) {
                 yield $finiquito;
