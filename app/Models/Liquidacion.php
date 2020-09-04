@@ -26,12 +26,16 @@ class Liquidacion extends Model
                 'l.Ano',
                 'l.FechaEmision',
                 DB::raw("CAST(ROUND(l.MontoAPagar, 2, 0) as decimal(18, 2)) MontoAPagar"),
-                't.IdBanco',
+                'b.Nombre as Banco',
                 't.NumeroCuentaBancaria'
             )
             ->join('dbo.Trabajador as t', [
                 't.IdEmpresa' => 'l.IdEmpresa',
                 'l.RutTrabajador' => 't.RutTrabajador'
+            ])
+            ->join('dbo.Banco as b', [
+                't.IdBanco' => 'b.IdBanco',
+                't.IdEmpresa' => 'b.IdEmpresa'
             ])
             ->where('l.IdFiniquito', '<>', '0')
             ->whereDate('l.FechaEmision', '>=', $desde)->whereDate('l.FechaEmision', '<=', $hasta)
