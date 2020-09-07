@@ -21,7 +21,14 @@ class Liquidacion extends Model
                 'l.IdLiquidacion',
                 'l.IdFiniquito',
                 'l.IdEmpresa',
-                'l.RutTrabajador',
+                DB::raw("
+                    CASE
+                        WHEN t.IdTipoDctoIden = 1
+                            THEN RIGHT('000000' + CAST(t.RutTrabajador as varchar), 8)
+                        ELSE
+                            RIGHT('000000' + CAST(t.RutTrabajador as varchar), 9)
+                    END AS RutTrabajador
+                "),
                 't.Nombre',
                 't.ApellidoPaterno',
                 't.ApellidoMaterno',
