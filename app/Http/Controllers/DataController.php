@@ -30,12 +30,12 @@ class DataController extends Controller
         $tipos_zonas = TipoZona::_all();
         $tipos_vias = TipoVia::_all();
         $zonas_labor = ZonaLabor::_all();
-        $oficios = Oficio::_all();
+        //$oficios = Oficio::_all();
         $regimenes = Regimen::_all();
-        $actividades = Actividad::_all();
-        $cuarteles = Cuartel::_all();
-        $agrupaciones = Agrupacion::_all();
-        $labores = Labor::_all();
+        //$actividades = Actividad::_all();
+        //$cuarteles = Cuartel::_all();
+        //$agrupaciones = Agrupacion::_all();
+        //$labores = Labor::_all();
         $tipos_contratos = TipoContrato::_all();
 
         $data = [
@@ -43,13 +43,14 @@ class DataController extends Controller
             'tipos_zonas'    => $tipos_zonas,
             'tipos_vias'     => $tipos_vias,
             'zonas_labor'    => $zonas_labor,
-            'oficios'        => $oficios,
             'regimenes'      => $regimenes,
+            'tipo_contrato'  => $tipos_contratos
+            /*
+            'oficios'        => $oficios,
             'actividades'    => $actividades,
             'cuarteles'      => $cuarteles,
             'agrupaciones'   => $agrupaciones,
-            'labores'        => $labores,
-            'tipo_contrato'  => $tipos_contratos
+            'labores'        => $labores,*/
         ];
 
         return response()->json([
