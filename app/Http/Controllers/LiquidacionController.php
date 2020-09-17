@@ -74,4 +74,13 @@ class LiquidacionController extends Controller
 
         return $result;
     }
+
+    public function getOneByOne(Request $request)
+    {
+        $finiquitosId = $request->get('finiquitosId');
+
+        $result = Liquidacion::getOneByOne($finiquitosId);
+
+        return response()->json($result);
+    }
 }

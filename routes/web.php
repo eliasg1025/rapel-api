@@ -59,6 +59,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
     $router->get('/finiquitos/exportar', 'LiquidacionController@exportar');
     $router->get('/finiquitos', 'LiquidacionController@get');
+    $router->post('/finiquitos/get/one-by-one', 'LiquidacionController@getOneByOne');
 
     $router->get('/trabajador/{dni:[0-9]+}/info-periodos', 'TrabajadoresController@infoPeriodos');
     $router->get('/trabajador/{dni:[0-9]+}/info-sctr', 'TrabajadoresController@infoSctr');

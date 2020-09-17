@@ -59,4 +59,43 @@ class Liquidacion extends Model
 
         return $finiquitos;
     }
+
+    public static function getOneByOne(array $finiquitosId)
+    {
+        $finiquitos = DB::table('dbo.Liquidacion as l')
+            ->select(
+                'l.IdLiquidacion',
+                'l.IdFiniquito',
+                'l.IdEmpresa',
+                DB::raw("
+                    CASE
+                        WHEN t.IdTipoDctoIden = 1
+                            THEN RIGHT('000000' + CAST(t.RutTrabajador as varchar), 8)
+                        ELSE
+                            RIGHT('000000' + CAST(t.RutTrabajador as varchar), 9)
+                    END AS RutTrabajador
+                "),
+                't.Nombre',
+                't.ApellidoPaterno',
+                't.ApellidoMaterno',
+                'l.Mes',
+                'l.Ano',
+                'l.FechaEmision',
+                DB::raw("CAST(ROUND(l.MontoAPagar, 2, 0) as decimal(18, 2)) MontoAPagar"),
+                'b.Nombre as Banco',
+                't.NumeroCuentaBancaria'
+            )
+            ->join('dbo.Trabajador as t', [
+                't.IdEmpresa' => 'l.IdEmpresa',
+                'l.RutTrabajador' => 't.RutTrabajador'
+            ])
+            ->join('dbo.Banco as b', [
+                't.IdBanco' => 'b.IdBanco',
+                't.IdEmpresa' => 'b.IdEmpresa'
+            ])
+            ->whereIn('l.IdLiquidacion', $finiquitosId)
+            ->get();
+
+        return $finiquitos;
+    }
 }
