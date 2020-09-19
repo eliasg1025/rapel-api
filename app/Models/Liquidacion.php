@@ -43,7 +43,7 @@ class Liquidacion extends Model
                 't.IdEmpresa' => 'l.IdEmpresa',
                 'l.RutTrabajador' => 't.RutTrabajador'
             ])
-            ->join('dbo.Banco as b', [
+            ->leftJoin('dbo.Banco as b', [
                 't.IdBanco' => 'b.IdBanco',
                 't.IdEmpresa' => 'b.IdEmpresa'
             ])
