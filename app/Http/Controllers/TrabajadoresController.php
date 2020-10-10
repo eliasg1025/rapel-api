@@ -124,4 +124,19 @@ class TrabajadoresController extends Controller
             return response()->json($e->getMessage(), 400);
         }
     }
+
+    public function getActivos( int $empresaId = 0 )
+    {
+        $result = Trabajador::getActivos($empresaId);
+        return response()->json($result);
+    }
+
+    public function getPanilla( Request $request, int $empresaId  )
+    {
+        $desde = $request->query('desde');
+        $hasta = $request->query('hasta');
+
+        $result = Trabajador::getPlanilla( $empresaId, $desde, $hasta );
+        return response()->json($result);
+    }
 }
