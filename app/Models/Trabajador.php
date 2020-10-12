@@ -404,186 +404,91 @@ class Trabajador extends Model
             ->get();
     }
 
-    public static function getPlanilla( int $empresaId = 9, $desde, $hasta )
+    public static function getPlanilla( int $empresaId = 9, $periodo, $zonaLaborId = 0 )
     {
-        // return DB::table('dbo.Liquidaciones', )
+        $periodo = Carbon::parse($periodo);
 
-        return DB::select(
-            "
+        $mes  = $periodo->month;
+        $anio = $periodo->year;
+
+        $data = DB::table('Liquidacion as l')
+            ->select(
+                'idLiquidacion as id',
+                'mes as mes',
+                'ano as anio',
+                'l.idEmpresa as empresa_id',
+                'l.idZona as zona_id',
+                DB::raw('CAST(ROUND(MontoAPagar, 2, 0) as decimal(18, 2)) as monto'),
+                'l.idTrabajador as trabajador_id',
+                'l.rutTrabajador as trabajador_rut',
+                't.nombre as trabajador_nombre',
+                't.apellidoPaterno as trabajador_apellido_paterno',
+                't.apellidoMaterno as trabajador_apellido_materno',
+                't.numeroCuentaBancaria as trabajador_numero_cuenta',
+                'b.nombre as trabajador_banco'
+            )
+            ->join('Trabajador as t', [
+                'l.idEmpresa'    => 't.idEmpresa',
+                'l.idTrabajador' => 't.idTrabajador'
+            ])
+            ->join('Banco as b', [
+                'b.idBanco'   => 't.idBanco',
+                'b.idEmpresa' => 't.idEmpresa'
+            ])
+            ->where('l.idempresa', $empresaId)
+            ->where('mes', $mes)
+            ->where('ano', $anio)
+            ->when($zonaLaborId != 0, function ($query) use ($empresaId, $zonaLaborId) {
+                $query->where([
+                    'l.idEmpresa' => $empresaId,
+                    'l.idZona'    => $zonaLaborId,
+                ]);
+            })
+            ->orderBy('idLiquidacion', 'ASC')
+            ->get();
+
+        $detalles = DB::select("
             SELECT
-                Liquidacion.IdLiquidacion,
-                [Año] = Liquidacion.Ano,
-                Mes = DATENAME(month, '01/'+LTRIM(STR(Liquidacion.Mes))+'/'+LTRIM(STR(Liquidacion.Ano))),
-                [Periodo] = CAST(Liquidacion.Ano AS NVARCHAR(8)) + ' ' + DATENAME(MONTH, CAST('01/' + STR(Liquidacion.Mes) + '/00' AS SmallDatetime)),
-                [Semana] = DATEPART(ww, CAST('01/' + STR(Liquidacion.Mes) + '/' + STR(Liquidacion.Ano) AS SmallDatetime)),
-                T.IdTrabajador ,
-                [Apellido Paterno] = APELLIDOPATERNO, [Apellido Materno]= APELLIDOMATERNO , [Nombres] = T.NOMBRE,
-                [Agrupacion Trabajador] = Ag.Descripcion,
-                [Institucion de Salud] = Isapre.Nombre,
-                [Institucion de Prevision] = Afp.Nombre,
-                [Tipo de Institucion de Prevision] =
-                    (
-                        CASE
-                            WHEN afp.IdSistemaPublico=1 AND afp.IdSSS=0 AND afp.IdEmpart=0 THEN 'Publico'
-                            WHEN afp.IdSistemaPublico=1 AND afp.IdSSS=1 AND afp.IdEmpart=0 THEN 'SSS'
-                            WHEN afp.IdSistemaPublico=1 AND afp.IdSSS=0 AND afp.IdEmpart=1 THEN 'Empart'
-                            ELSE 'Privado' END
-                    ),
-                [Concepto] = CAST(co.IdConcepto AS NVARCHAR(8)) + ' ' + co.Descripcion,
-                [Monto Haber/Descuento $] =
-                    (
+                Liquidacion.IdLiquidacion as liquidacion_id,
+                [concepto] = CAST(co.IdConcepto AS NVARCHAR(8)) + ' ' + co.Descripcion,
+                [monto_haber_descuento] =
+                    CAST((
                         CASE
                             WHEN Afp.idsistemaPublico=1 AND (Afp.IdSSS=1 OR Afp.IdEmpart=1) THEN
                             (
                                 CASE
-                                    WHEN DetalleLiquidacion.IdConcepto = 504 THEN
-                                    (
-                                        DetalleLiquidacion.Monto + Liquidacion.MontoAfp
-                                    )
-                                ELSE DetalleLiquidacion.Monto
+                                    WHEN DetalleLiquidacion.IdConcepto = 504
+                                    THEN (DetalleLiquidacion.Monto + Liquidacion.MontoAfp)
+                                    ELSE DetalleLiquidacion.Monto
                                 END
                             )
                             ELSE
                             (
                                 CASE
-                                    WHEN DetalleLiquidacion.IdConcepto = 504 THEN DetalleLiquidacion.Monto
+                                    WHEN DetalleLiquidacion.IdConcepto = 504
+                                    THEN DetalleLiquidacion.Monto
                                     ELSE DetalleLiquidacion.Monto
-                                    END
+                                END
                             )
                             END
-                    ),
-                [Monto Haber/Descuento US$] =
-                    CASE
-                        WHEN ISNULL(
-                            (
-                                SELECT TOP 1 ValorTipoCambio from ValoresMonedas
-                                WHERE Month(FechaTipoCambio) <= Liquidacion.Mes AND Year(FechaTipoCambio) = Liquidacion.Ano AND IdMoneda = 3
-                            ), 0
-                        ) = 0 THEN 0
-                        ELSE
-                        DetalleLiquidacion.Monto * (CASE Indicadordebe WHEN 0 THEN -1 ELSE 1 END) / ISNULL((SELECT TOP 1 ValorTipoCambio from ValoresMonedas WHERE
-                        Month(FechaTipoCambio) <= Liquidacion.Mes AND Year(FechaTipoCambio) = Liquidacion.Ano
-                        AND IdMoneda = 3
-                        ), 0)
-                        END,
-                [Labor] = Actividades.Nombre,
-                [Tipo Haber/Descuento] = (CASE WHEN Indicadordebe = 1 THEN 'HABERES' ELSE 'DESCUENTOS' END),
-                [Actividad] = FamiliaActividades.Nombre,
-                [Cod.Zona] = Liquidacion.IdZona,
-                [Zona] = Zona.Nombre,
-                [Cuartel] = Cuartel.Nombre, [Fecha Inicio] = c.fechainicio,
-                [Tipo Trabajador] = (CASE WHEN C.IdTipo = 1 THEN 'MENSUAL' ELSE 'DIARIO' END),
-                [Tipo Contrato] = (CASE WHEN C.IndicadorIndefinido = 0 THEN case when c.FechaTerminoC is null then 'Por Faena' else 'PLAZO FIJO' end ELSE 'INDEFINIDO' END),
-                [Tipo Regimen]= tr.descripcion,
-                [Dias Trabajados]= Liquidacion.DiasTrabajados,
-                [Total Haber] =
-                    (
-                        CASE
-                            WHEN Indicadordebe = 1 and isnull(co.idagrupacion,'') <> 'HORAS'  and co.total=0 and co.IDCONCEPTO<>'150' THEN DetalleLiquidacion.Monto
-                            ELSE 0
-                            END
-                    ),
-                (
-                    CASE t.IndicadorDeposito WHEN 1 THEN (
-                        CASE T.TipoCuentaBancaria WHEN 1 THEN 'Cta. Vista' ELSE 'Cta. Corriente' END
-                    )
-                    ELSE 'Sin Cuenta'
-                    END
-                ) AS TipoCuenta,
-                T.NumeroCuentaBancaria,Ba.Nombre as Banco ,
-                (
-                    CASE co.Total WHEN 1 THEN case when co.IDCONCEPTO='101' then 'De Liquidacion' else 'Para Analisis' end ELSE 'De Liquidacion' END
-                ) as [Tipo Concepto],
-                (
-                    CASE WHEN Liquidacion.IdFiniquito <> 0 THEN 'Finiquito' ELSE 'Liquidacion' END
-                ) as Tipo  ,
-                CASE e.DECIMAL
-                    when 0 THEN ltrim(str(Liquidacion.Ruttrabajador)) + '-' + Digito
-                    ELSE replicate('0', Tdi.LARGO - Len(Liquidacion.Ruttrabajador))+LEFT(Liquidacion.Ruttrabajador,Tdi.LARGO)
-                    END as [Rut Trabajador],
-                 horasExtras as [Horas Extras],
-                -- A solicitud de Juan Carvacho se agregó este campo
-                [Horas Extras Adicionales] = (
-                    SELECT SUM(HoraExtrasAdicional) FROM ActividadTrabajador WITH(NOLOCK)
-                    WHERE IdEmpresa = C.IdEmpresa AND IdTrabajador = C.IdTrabajador
-                    AND MONTH(FechaActividad) = Liquidacion.MES AND YEAR(FechaActividad) = Liquidacion.ANO
-                ),
-                -- Fin
-                diastrabporsueldo as [Dias Trabajados por sueldo],
-                [Sueldo Base Ficha]=liquidacion.SUELDOBASEcontrato,
-                [Fecha Inicio Periodo]=c.fechainicioperiodo,
-                [Fecha Finiquito]=c.fechatermino,
-                [Cantidad ] =
-                    case
-                        WHEN co.IDCONCEPTO='109' THEN (
-                            SELECT DIASHABILES FROM  VACACIONES V
-                            WHERE (V.IDEMPRESA = LIQUIDACION.IDEMPRESA) AND (V.IDTRABAJADOR = LIQUIDACION.IDTRABAJADOR)
-                            AND MONTH(V.FECHAINICIO)=LIQUIDACION.MES AND YEAR(V.FECHAINICIO)=LIQUIDACION.ANO)
-                            WHEN co.IDCONCEPTO<>'109' THEN DETALLELIQUIDACION.CANTIDAD
-                    END,
-                Titulo =
-                    CASE
-                        WHEN co.INDICADORDEBE=1 AND (co.IDCONCEPTO<>580 ) THEN 'TOTAL INGRESOS'
-                        WHEN co.IDCONCEPTO=101  THEN 'A PAGO'
-                        WHEN co.INDICADORHABER=1 AND (co.IDCONCEPTO<>210 ) THEN 'TOTAL DESCUENTOS'
-                        WHEN co.IDCONCEPTO=210 or co.IDCONCEPTO=580  THEN case when E.Decimal=0  then  'TOTAL DESCUENTOS' else 'TOTAL APORTACIONES' end
-                    END,
-                Utilidades = CASE WHEN ISNULL(co.DISTRIBUCION,0)=0 THEN 'NO' ELSE 'SI' END,
-                T.Sexo,
-                T.IdTramo,
-                T.IndicadorDeposito,
-                Vigencia = (case C.IndicadorVigencia when 1 then 'Si' else 'No' end),
-                co.IdAgrupacion,
-                [Correlativo Impresion] = CorrImpresion,
-                [Oficio] = O.Descripcion ,
-                ImponibleTributable = CASE WHEN ISNULL(co.ImponibleTributable,0)=0 THEN 'NO' ELSE 'SI' END,
-                Titulo2 =
-                    CASE WHEN Indicadordebe = 1 then
-                        CASE WHEN ISNULL(co.ImponibleTributable,0)=1 THEN
-                            case
-                                when co.IDCONCEPTO=100 or co.IDCONCEPTO=400 or co.IDCONCEPTO=160 or co.IDCONCEPTO=180 then 'Imponibles'
-                                ELSE 'Otros Imponibles'
-                            END else
-                        case
-                            when co.IDCONCEPTO=150 or co.IDCONCEPTO=199 or co.IDCONCEPTO=506 or co.IDCONCEPTO=507 then ' No Imponibles'
-                            ELSE 'Otros No Imponibles' END end
-                            else
-                            case when co.IDCONCEPTO=200 or co.IDCONCEPTO=205 or co.IDCONCEPTO=207 or co.IDCONCEPTO=210 or co.IDCONCEPTO=211 or co.IDCONCEPTO=211 or co.IDCONCEPTO=230 or co.IDCONCEPTO=250 or co.IDCONCEPTO=261 then ' Legales'
-                            ELSE case when co.IdConcepto='101' then ' ' else  'Otros descuentos' end END
-                        end,
-                liquidacion.Mixta as [Mixta],
-                [Cussp]=liquidacion.cussp,
-                ltrim(str(liquidacion.IdZonaLabores)) + ' ' + Zl.Nombre as [Zona Labores],  liquidacion.NumeroCuentaBancaria as [Numero Cuenta Bancaria]  ,
-                ltrim(str(liquidacion.IdBanco)) + ' ' + ba1.Nombre as [Banco 1]
-                --,co.*
+                    ) AS DECIMAL(18, 2)),
+                [tipo_haber_descuento] = (CASE WHEN Indicadordebe = 1 THEN 'HABERES' ELSE 'DESCUENTOS' END)
             FROM Liquidacion WITH(NOLOCK)
-            INNER JOIN Trabajador T WITH(NOLOCK) ON Liquidacion.IdTrabajador = T.IdTrabajador AND Liquidacion.IdEmpresa = T.IdEmpresa
-            INNER JOIN Contratos C WITH(NOLOCK) ON Liquidacion.Idempresa=C.IdEmpresa and Liquidacion.Idtrabajador=C.Idtrabajador and Liquidacion.idcontrato=C.IdContrato and Liquidacion.IdZona=C.IdZona
-            INNER JOIN Agrupacion Ag ON Ag.IdEmpresa = C.IdEmpresa AND AG.IdAgrupacion = C.IdAgrupacion
             INNER JOIN DetalleLiquidacion WITH(NOLOCK) ON Liquidacion.IdLiquidacion = DetalleLiquidacion.IdLiquidacion
             INNER JOIN ConceptosHaberDescuento co WITH(NOLOCK) ON DetalleLiquidacion.IdConcepto = co.IdConcepto AND DetalleLiquidacion.IdEmpresa = co.IdEmpresa
-            INNER JOIN Isapre WITH(NOLOCK) ON Isapre.IdEmpresa = liquidacion.IdEmpresa AND Isapre.IdIsapre = liquidacion.IdIsapre
             INNER JOIN Afp WITH(NOLOCK) ON Afp.IdEmpresa = liquidacion.IdEmpresa AND Afp.IdAfp = liquidacion.IdAfp
-            LEFT JOIN Actividades WITH(NOLOCK) ON liquidacion.IdActividadcontrato = Actividades.IdActividad AND liquidacion.IdFamiliacontrato = Actividades.IdFamilia AND liquidacion.IdEmpresa = Actividades.IdEmpresa
-            LEFT JOIN FamiliaActividades WITH(NOLOCK) ON Actividades.IdFamilia = FamiliaActividades.IdFamilia AND Actividades.IdEmpresa = FamiliaActividades.IdEmpresa
-            LEFT JOIN Zona WITH(NOLOCK) ON liquidacion.IdZona = Zona.IdZona AND liquidacion.IdEmpresa = Zona.IdEmpresa
-            LEFT JOIN Zona ZL WITH(NOLOCK) ON liquidacion.IdZonaLabores = Zl.IdZona AND liquidacion.IdEmpresa = Zl.IdEmpresa
-            LEFT JOIN Cuartel WITH(NOLOCK) ON liquidacion.IdEmpresa = Cuartel.IdEmpresa AND liquidacion.IdZona = Cuartel.IdZona AND liquidacion.IdCuartelcontrato = Cuartel.IdCuartel
-            LEFT JOIN Banco Ba WITH(NOLOCK) ON Ba.IdEmpresa =T.IdEmpresa and Ba.IdBanco=T.IdBanco
-            LEFT JOIN Banco Ba1 WITH(NOLOCK) ON Ba1.IdEmpresa =Liquidacion.IdEmpresa and Ba1.IdBanco=Liquidacion.IdBanco
-            left join TipoRegimen tr WITH(NOLOCK) on tr.idtipo=Liquidacion.IDRegimenContrato
-            INNER JOIN EMPRESA E WITH(NOLOCK) ON E.IDEMPRESA=T.IDEMPRESA
-            left join TipoDctoIden tdi on  tdi.idempresa=t.idempresa and tdi.IdTipoDctoIden=t.IdTipoDctoIden
-            LEFT JOIN OFICIO O WITH(NOLOCK) ON O.IdEmpresa=T.IdEmpresa AND O.IdOficio=c.IdOficio
-            WHERE Liquidacion.IdEmpresa = 9
-            --AND (Liquidacion.IdTrabajador=NULL OR NULL IS NULL)
-            AND Liquidacion.IdTrabajador = '022227'
+            WHERE Liquidacion.IdEmpresa in ($empresaId)
+            and Liquidacion.Mes = $mes and Liquidacion.Ano = $anio and Liquidacion.IdZona = $zonaLaborId
             AND (
-                co.Total = 0 or DetalleLiquidacion.idconcepto in (251,287,505,504,101,560,581,141,288,285,286,248,503) -- modificado mavc 28/07/2014
+                co.Total = 0 or DetalleLiquidacion.idconcepto in (251,287,505,504,101,560,581,141,288,285,286,248,503)
             )
-            AND CAST('01/' + LTRIM(STR(Liquidacion.mes)) + '/' + LTRIM(STR(Liquidacion.Ano)) as smalldatetime) BETWEEN '01/09/2020' AND '30/09/2020'
-            AND Liquidacion.IDZONA IN (SELECT * FROM dbo.TblArr('63'))
-            "
-        );
+        ");
+
+        return [
+            'count'         => sizeof($data),
+            'liquidaciones' => $data,
+            'detalles'      => $detalles
+        ];
     }
+
 }

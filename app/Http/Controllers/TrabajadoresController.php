@@ -133,10 +133,10 @@ class TrabajadoresController extends Controller
 
     public function getPanilla( Request $request, int $empresaId  )
     {
-        $desde = $request->query('desde');
-        $hasta = $request->query('hasta');
+        $periodo     = $request->query('periodo');
+        $zonaLaborId = $request->query('zonaLaborId');
 
-        $result = Trabajador::getPlanilla( $empresaId, $desde, $hasta );
+        $result = Trabajador::getPlanilla( $empresaId, $periodo, $zonaLaborId );
         return response()->json($result);
     }
 }
