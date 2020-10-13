@@ -404,14 +404,15 @@ class Trabajador extends Model
             ->get();
     }
 
-    public static function getPlanilla( int $empresaId = 9, $periodo, $zonaLaborId = 0 )
+    public static function panillaGenerator( int $empresaId = 9, $periodo, $zonaLaborId = 0 )
     {
         $periodo = Carbon::parse($periodo);
 
         $mes  = $periodo->month;
         $anio = $periodo->year;
 
-        $data = DB::table('Liquidacion as l')
+        foreach (
+            DB::table('Liquidacion as l')
             ->select(
                 'idLiquidacion as id',
                 'mes as mes',
@@ -444,10 +445,75 @@ class Trabajador extends Model
                     'l.idZona'    => $zonaLaborId,
                 ]);
             })
-            ->orderBy('idLiquidacion', 'ASC')
+            ->cursor() as $liquidacion
+        ) {
+            yield $liquidacion;
+        }
+    }
+
+    public static function getDetallePlanilla( int $empresaId = 9, $periodo, $zonaLaborId = 0 )
+    {
+        $periodo = Carbon::parse($periodo);
+
+        $mes  = $periodo->month;
+        $anio = $periodo->year;
+
+        $detalles = DB::table('Liquidacion as l')
+            ->select(
+                'l.idLiquidacion as liquidacion_id',
+                DB::raw("(CAST(co.IdConcepto AS NVARCHAR(8)) + ' ' + co.Descripcion) as concepto"),
+                DB::raw("
+                    CAST((
+                        CASE
+                            WHEN Afp.idsistemaPublico=1 AND (Afp.IdSSS=1 OR Afp.IdEmpart=1) THEN
+                            (
+                                CASE
+                                    WHEN dl.IdConcepto = 504
+                                    THEN (dl.Monto + l.MontoAfp)
+                                    ELSE dl.Monto
+                                END
+                            )
+                            ELSE
+                            (
+                                CASE
+                                    WHEN dl.IdConcepto = 504
+                                    THEN dl.Monto
+                                    ELSE dl.Monto
+                                END
+                            )
+                            END
+                    ) AS DECIMAL(18, 2)) as monto_haber_descuento
+                "),
+                DB::raw("(CASE WHEN Indicadordebe = 1 THEN 'HABERES' ELSE 'DESCUENTOS' END) as tipo_haber_descuento")
+            )
+            ->join('DetalleLiquidacion as dl', 'l.idLiquidacion', '=', 'dl.idLiquidacion')
+            ->join('ConceptosHaberDescuento as co', [
+                'dl.IdConcepto' => 'co.IdConcepto',
+                'dl.IdEmpresa'  => 'co.IdEmpresa'
+            ])
+            ->join('Afp', [
+                'Afp.IdEmpresa' => 'l.IdEmpresa',
+                'Afp.IdAfp' => 'l.IdAfp'
+            ])
+            ->where('l.idEmpresa', $empresaId)
+            ->where([
+                'l.Mes' => $mes,
+                'l.Ano' => $anio
+            ])
+            ->whereRaw("
+                (
+                    co.Total = 0 or dl.idconcepto in (251,287,505,504,101,560,581,141,288,285,286,248,503)
+                )
+            ")
+            ->when($zonaLaborId != 0, function ($query) use ($empresaId, $zonaLaborId) {
+                $query->where([
+                    'l.idEmpresa' => $empresaId,
+                    'l.idZona'    => $zonaLaborId,
+                ]);
+            })
             ->get();
 
-        $detalles = DB::select("
+        DB::select("
             SELECT
                 Liquidacion.IdLiquidacion as liquidacion_id,
                 [concepto] = CAST(co.IdConcepto AS NVARCHAR(8)) + ' ' + co.Descripcion,
@@ -485,10 +551,74 @@ class Trabajador extends Model
         ");
 
         return [
-            'count'         => sizeof($data),
-            'liquidaciones' => $data,
+            'count'         => sizeof($detalles),
             'detalles'      => $detalles
         ];
     }
 
+    public static function detallePlanillaGenerator( int $empresaId = 9, $periodo, $zonaLaborId = 0 )
+    {
+        $periodo = Carbon::parse($periodo);
+
+        $mes  = $periodo->month;
+        $anio = $periodo->year;
+
+        foreach (
+            DB::table('Liquidacion as l')
+            ->select(
+                'l.idLiquidacion as liquidacion_id',
+                DB::raw("(CAST(co.IdConcepto AS NVARCHAR(8)) + ' ' + co.Descripcion) as concepto"),
+                DB::raw("
+                    CAST((
+                        CASE
+                            WHEN Afp.idsistemaPublico=1 AND (Afp.IdSSS=1 OR Afp.IdEmpart=1) THEN
+                            (
+                                CASE
+                                    WHEN dl.IdConcepto = 504
+                                    THEN (dl.Monto + l.MontoAfp)
+                                    ELSE dl.Monto
+                                END
+                            )
+                            ELSE
+                            (
+                                CASE
+                                    WHEN dl.IdConcepto = 504
+                                    THEN dl.Monto
+                                    ELSE dl.Monto
+                                END
+                            )
+                            END
+                    ) AS DECIMAL(18, 2)) as monto_haber_descuento
+                "),
+                DB::raw("(CASE WHEN Indicadordebe = 1 THEN 'HABERES' ELSE 'DESCUENTOS' END) as tipo_haber_descuento")
+            )
+            ->join('DetalleLiquidacion as dl', 'l.idLiquidacion', '=', 'dl.idLiquidacion')
+            ->join('ConceptosHaberDescuento as co', [
+                'dl.IdConcepto' => 'co.IdConcepto',
+                'dl.IdEmpresa'  => 'co.IdEmpresa'
+            ])
+            ->join('Afp', [
+                'Afp.IdEmpresa' => 'l.IdEmpresa',
+                'Afp.IdAfp' => 'l.IdAfp'
+            ])
+            ->where('l.idEmpresa', $empresaId)
+            ->where([
+                'l.Mes' => $mes,
+                'l.Ano' => $anio
+            ])
+            ->whereRaw("
+                (
+                    co.Total = 0 or dl.idconcepto in (251,287,505,504,101,560,581,141,288,285,286,248,503)
+                )
+            ")
+            ->when($zonaLaborId != 0, function ($query) use ($empresaId, $zonaLaborId) {
+                $query->where([
+                    'l.idEmpresa' => $empresaId,
+                    'l.idZona'    => $zonaLaborId,
+                ]);
+            })->cursor() as $detalle
+        ) {
+            yield $detalle;
+        }
+    }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ActividadTrabajador;
 use App\Models\Trabajador;
 use Illuminate\Http\Request;
+use Rap2hpoutre\FastExcel\FastExcel;
 
 class TrabajadoresController extends Controller
 {
@@ -136,7 +137,18 @@ class TrabajadoresController extends Controller
         $periodo     = $request->query('periodo');
         $zonaLaborId = $request->query('zonaLaborId');
 
-        $result = Trabajador::getPlanilla( $empresaId, $periodo, $zonaLaborId );
-        return response()->json($result);
+        $panillaGenerator = Trabajador::panillaGenerator( $empresaId, $periodo, $zonaLaborId );
+
+        return (new FastExcel($panillaGenerator))->download('liquidaciones.csv');
+    }
+
+    public function getDetallePanilla( Request $request, int $empresaId )
+    {
+        $periodo     = $request->query('periodo');
+        $zonaLaborId = $request->query('zonaLaborId');
+
+        $detallePlanillaGenerator = Trabajador::detallePlanillaGenerator( $empresaId, $periodo, $zonaLaborId );
+        //return response()->json($detallePlanilla);
+        return (new FastExcel($detallePlanillaGenerator))->download('detalleLiquidaciones.csv');
     }
 }
