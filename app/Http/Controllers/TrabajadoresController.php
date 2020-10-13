@@ -139,7 +139,7 @@ class TrabajadoresController extends Controller
 
         $panillaGenerator = Trabajador::panillaGenerator( $empresaId, $periodo, $zonaLaborId );
 
-        return (new FastExcel($panillaGenerator))->download('liquidaciones.csv');
+        return (new FastExcel($panillaGenerator))->download('payments.csv');
     }
 
     public function getDetallePanilla( Request $request, int $empresaId )
@@ -149,6 +149,16 @@ class TrabajadoresController extends Controller
 
         $detallePlanillaGenerator = Trabajador::detallePlanillaGenerator( $empresaId, $periodo, $zonaLaborId );
         //return response()->json($detallePlanilla);
-        return (new FastExcel($detallePlanillaGenerator))->download('detalleLiquidaciones.csv');
+        return (new FastExcel($detallePlanillaGenerator))->download('paymentsDetail.csv');
+    }
+
+    public function getTrabajadoresPlanilla( Request $request, int $empresaId )
+    {
+        $periodo     = $request->query('periodo');
+        $zonaLaborId = $request->query('zonaLaborId');
+
+        $trabajadoresPlanillaGenerator = Trabajador::trabajadorPlanillaGenerator( $empresaId, $periodo, $zonaLaborId );
+        //return response()->json($trabajadoresPlanillaGenerator);
+        return (new FastExcel($trabajadoresPlanillaGenerator))->download('employees.csv');
     }
 }

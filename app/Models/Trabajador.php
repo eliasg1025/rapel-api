@@ -403,6 +403,85 @@ class Trabajador extends Model
             ->get();
     }
 
+    public static function trabajadorPlanillaGenerator( int $empresaId = 9, $periodo, $zonaLaborId = 0 )
+    {
+        $periodo = Carbon::parse($periodo);
+
+        $mes  = $periodo->month;
+        $anio = $periodo->year;
+
+        /*
+        $result = DB::table('Liquidacion as l')
+            ->select(
+                'l.idTrabajador as id',
+                'l.rutTrabajador as rut',
+                't.nombre as nombre',
+                't.apellidoPaterno as apellido_paterno',
+                't.apellidoMaterno as apellido_materno',
+                't.numeroCuentaBancaria as numero_cuenta',
+                'b.nombre as banco',
+                't.idEmpresa as empresa_id'
+            )
+            ->join('Trabajador as t', [
+                'l.idEmpresa'    => 't.idEmpresa',
+                'l.idTrabajador' => 't.idTrabajador'
+            ])
+            ->join('Banco as b', [
+                'b.idBanco'   => 't.idBanco',
+                'b.idEmpresa' => 't.idEmpresa'
+            ])
+            ->where('l.idempresa', $empresaId)
+            ->where('mes', $mes)
+            ->where('ano', $anio)
+            ->distinct('id')
+            ->when($zonaLaborId != 0, function ($query) use ($empresaId, $zonaLaborId) {
+                $query->where([
+                    'l.idEmpresa' => $empresaId,
+                    'l.idZona'    => $zonaLaborId,
+                ]);
+            })
+            ->get();
+
+        return [
+            'count' => sizeof($result),
+            'data' => $result
+        ];*/
+
+        foreach (
+            DB::table('Liquidacion as l')
+            ->select(
+                'l.rutTrabajador as id',
+                't.nombre as nombre',
+                't.apellidoPaterno as apellido_paterno',
+                't.apellidoMaterno as apellido_materno',
+                't.numeroCuentaBancaria as numero_cuenta',
+                'b.nombre as banco',
+                't.idEmpresa as empresa_id'
+            )
+            ->join('Trabajador as t', [
+                'l.idEmpresa'    => 't.idEmpresa',
+                'l.idTrabajador' => 't.idTrabajador'
+            ])
+            ->join('Banco as b', [
+                'b.idBanco'   => 't.idBanco',
+                'b.idEmpresa' => 't.idEmpresa'
+            ])
+            ->distinct('id')
+            ->where('l.idempresa', $empresaId)
+            ->where('mes', $mes)
+            ->where('ano', $anio)
+            ->when($zonaLaborId != 0, function ($query) use ($empresaId, $zonaLaborId) {
+                $query->where([
+                    'l.idEmpresa' => $empresaId,
+                    'l.idZona'    => $zonaLaborId,
+                ]);
+            })
+            ->cursor() as $trabajador
+        ) {
+            yield $trabajador;
+        }
+    }
+
     public static function panillaGenerator( int $empresaId = 9, $periodo, $zonaLaborId = 0 )
     {
         $periodo = Carbon::parse($periodo);
@@ -421,11 +500,6 @@ class Trabajador extends Model
                 DB::raw('CAST(ROUND(MontoAPagar, 2, 0) as decimal(18, 2)) as monto'),
                 'l.idTrabajador as trabajador_id',
                 'l.rutTrabajador as trabajador_rut',
-                't.nombre as trabajador_nombre',
-                't.apellidoPaterno as trabajador_apellido_paterno',
-                't.apellidoMaterno as trabajador_apellido_materno',
-                't.numeroCuentaBancaria as trabajador_numero_cuenta',
-                'b.nombre as trabajador_banco'
             )
             ->join('Trabajador as t', [
                 'l.idEmpresa'    => 't.idEmpresa',

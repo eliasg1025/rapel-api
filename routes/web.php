@@ -29,6 +29,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('/trabajadores/{empresaId:[0-9]+}/activos', 'TrabajadoresController@getActivos');
     $router->get('/planilla/{empresaId:[0-9]+}', 'TrabajadoresController@getPanilla');
     $router->get('/planilla/detalle/{empresaId:[0-9]+}', 'TrabajadoresController@getDetallePanilla');
+    $router->get('/planilla/trabajadores/{empresaId:[0-9]+}', 'TrabajadoresController@getTrabajadoresPlanilla');
     $router->post('/planilla/sctr/{empresa_id}', 'TrabajadoresController@getTrabajadoresSctr');
     $router->get('/departamento', 'DepartamentosController@get');
     $router->get('/departamento/{codigo}', 'DepartamentosController@show');
