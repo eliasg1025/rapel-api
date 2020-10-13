@@ -136,7 +136,7 @@ class Trabajador extends Model
             $contratos = Contrato::byPeriodo($dni);
 
             if ( sizeof($contratos) === 0 ) {
-                throw new Error('Este persona no tiene contratos');
+                throw new Error('Esta persona no tiene contratos');
             }
 
             $ultimoContrato = $contratos[0];
@@ -157,26 +157,25 @@ class Trabajador extends Model
                     'n.Descripcion as nacionalidad',
                     'z.Nombre as zona_labor'
                 )
-                ->join('dbo.Nacionalidad as n', [
+                ->leftJoin('dbo.Nacionalidad as n', [
                     'n.IdEmpresa' => 't.IdEmpresa',
                     'n.IdNacionalidad' => 't.IdNacionalidad'
                 ])
-                ->join('dbo.Zona as z', [
+                ->leftJoin('dbo.Zona as z', [
                     't.IdEmpresa' => 'z.IdEmpresa',
                     't.IdZonaLabores' => 'z.IdZona'
                 ])
                 ->where('RutTrabajador', $dni)
-                ->where('t.IdEmpresa', $ultimoContrato->empresa_id)
+                ->whereIn('t.IdEmpresa', [$ultimoContrato->empresa_id])
                 ->first();
 
-            $ultimoContrato->zona_labor = $trabajador->zona_labor;
+            $ultimoContrato->zona_labor = !is_null($trabajador->zona_labor) ? $trabajador->zona_labor : $ultimoContrato->zona_labor;
 
             return [
                 'rut' => $dni,
                 'trabajador' => $trabajador,
                 'alertas' => $alertas,
                 'periodos' => $contratos,
-                'value' => $ultimoContrato,
             ];
         } catch (\Exception $e) {
             return [
