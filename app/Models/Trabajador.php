@@ -450,13 +450,19 @@ class Trabajador extends Model
         foreach (
             DB::table('Liquidacion as l')
             ->select(
-                'l.rutTrabajador as id',
+                DB::raw("
+                    CASE
+                        WHEN t.IdTipoDctoIden = 1
+                            THEN RIGHT('000000' + CAST(t.RutTrabajador as varchar), 8)
+                        ELSE
+                            RIGHT('000000' + CAST(t.RutTrabajador as varchar), 9)
+                    END AS id
+                "),
                 't.nombre as nombre',
                 't.apellidoPaterno as apellido_paterno',
                 't.apellidoMaterno as apellido_materno',
                 't.numeroCuentaBancaria as numero_cuenta',
-                'b.nombre as banco',
-                't.idEmpresa as empresa_id'
+                'b.nombre as banco'
             )
             ->join('Trabajador as t', [
                 'l.idEmpresa'    => 't.idEmpresa',
@@ -498,8 +504,14 @@ class Trabajador extends Model
                 'l.idEmpresa as empresa_id',
                 'l.idZona as zona_id',
                 DB::raw('CAST(ROUND(MontoAPagar, 2, 0) as decimal(18, 2)) as monto'),
-                'l.idTrabajador as trabajador_id',
-                'l.rutTrabajador as trabajador_rut',
+                DB::raw("
+                    CASE
+                        WHEN t.IdTipoDctoIden = 1
+                            THEN RIGHT('000000' + CAST(t.RutTrabajador as varchar), 8)
+                        ELSE
+                            RIGHT('000000' + CAST(t.RutTrabajador as varchar), 9)
+                    END AS trabajador_id
+                "),
             )
             ->join('Trabajador as t', [
                 'l.idEmpresa'    => 't.idEmpresa',
@@ -639,6 +651,7 @@ class Trabajador extends Model
         foreach (
             DB::table('Liquidacion as l')
             ->select(
+                'dl.IdDetalle as id',
                 'l.idLiquidacion as liquidacion_id',
                 DB::raw("(CAST(co.IdConcepto AS NVARCHAR(8)) + ' ' + co.Descripcion) as concepto"),
                 DB::raw("
