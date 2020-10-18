@@ -68,5 +68,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('/trabajador/{dni:[0-9]+}/info-periodos', 'TrabajadoresController@infoPeriodos');
     $router->get('/trabajador/{dni:[0-9]+}/info-sctr', 'TrabajadoresController@infoSctr');
 
+    $router->post('/anticipos', 'AnticiposController@get');
+    $router->post('/anticipos/horas/no-dig', 'AnticiposController@getHorasSinDigitacion');
+    $router->post('/anticipos/horas/dig', 'AnticiposController@getHorasConDigitacion');
+
     $router->get('/test/{rut:[0-9]+}', 'TrabajadoresController@test');
 });
