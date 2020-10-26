@@ -9,11 +9,6 @@ use Rap2hpoutre\FastExcel\FastExcel;
 
 class TrabajadoresController extends Controller
 {
-    public function __construct()
-    {
-        //
-    }
-
     public function show(Request $request, $dni)
     {
         $activo = $request->query('activo') ? filter_var($request->query('activo'), FILTER_VALIDATE_BOOLEAN) : true;
@@ -116,7 +111,7 @@ class TrabajadoresController extends Controller
         return Trabajador::buscarTodos($palabra);
     }
 
-    public function test($rut)
+    public function getUltimoDiaLaborado($rut)
     {
         try {
             $actividad = ActividadTrabajador::getUltimoDiaLaborado($rut);

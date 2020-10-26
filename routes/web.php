@@ -27,9 +27,6 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('/trabajador/revision', 'TrabajadoresController@revision');
     $router->post('/trabajador/revision/sin-trabajadores', 'TrabajadoresController@revisionSinTrabajadores');
     $router->get('/trabajadores/{empresaId:[0-9]+}/activos', 'TrabajadoresController@getActivos');
-    $router->get('/planilla/{empresaId:[0-9]+}', 'TrabajadoresController@getPanilla');
-    $router->get('/planilla/detalle/{empresaId:[0-9]+}', 'TrabajadoresController@getDetallePanilla');
-    $router->get('/planilla/trabajadores/{empresaId:[0-9]+}', 'TrabajadoresController@getTrabajadoresPlanilla');
     $router->post('/planilla/sctr/{empresa_id}', 'TrabajadoresController@getTrabajadoresSctr');
     $router->get('/departamento', 'DepartamentosController@get');
     $router->get('/departamento/{codigo}', 'DepartamentosController@show');
@@ -68,9 +65,18 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('/trabajador/{dni:[0-9]+}/info-periodos', 'TrabajadoresController@infoPeriodos');
     $router->get('/trabajador/{dni:[0-9]+}/info-sctr', 'TrabajadoresController@infoSctr');
 
-    $router->post('/anticipos', 'AnticiposController@get');
-    $router->post('/anticipos/horas/no-dig', 'AnticiposController@getHorasSinDigitacion');
-    $router->post('/anticipos/horas/dig', 'AnticiposController@getHorasConDigitacion');
+    $router->group(['prefix' => 'anticipos'], function () use ($router) {
+        $router->post('/anticipos', 'AnticiposController@get');
+        $router->post('/anticipos/horas/no-dig', 'AnticiposController@getHorasSinDigitacion');
+        $router->post('/anticipos/horas/dig', 'AnticiposController@getHorasConDigitacion');
+    });
+
+    $router->group(['prefix' => 'sueldos'], function () use ($router) {
+        $router->post('/planilla', 'SueldosController@getPlanilla');
+        $router->post('/detalle-planilla', 'SueldosController@getDetallePlanilla');
+        $router->post('/horas-jornal', 'SueldosController@getHorasJornal');
+        $router->post('/horas-no-jornal', 'SueldosController@getHorasNoJornal');
+    });
 
     $router->get('/test/{rut:[0-9]+}', 'TrabajadoresController@test');
 });
