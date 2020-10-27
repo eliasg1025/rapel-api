@@ -34,10 +34,13 @@ class Planilla extends Model
                 "),
                 'b.Nombre as banco',
                 't.NumeroCuentaBancaria as numero_cuenta',
+                'c.FechaInicioPeriodo as fecha_inicio',
                 't.nombre as trabajador_nombre',
                 't.apellidoPaterno as trabajador_apellido_paterno',
                 't.apellidoMaterno as trabajador_apellido_materno',
-                'c.Jornal as trabajador_jornal'
+                'c.Jornal as trabajador_jornal',
+                'c.IdRegimen as trabajador_regimen_id',
+                'o.Descripcion as trabajador_oficio'
             )
             ->join('Trabajador as t', [
                 'l.idEmpresa'    => 't.idEmpresa',
@@ -50,6 +53,10 @@ class Planilla extends Model
             ->join('Contratos as c', [
                 'c.IdEmpresa' => 'l.IdEmpresa',
                 'l.IdContrato' => 'c.IdContrato'
+            ])
+            ->join('Oficio as o', [
+                'o.IdEmpresa' => 'c.IdEmpresa',
+                'o.IdOficio' => 'c.IdOficio'
             ])
             ->where('l.idempresa', $empresaId)
             ->where('mes', $mes)
