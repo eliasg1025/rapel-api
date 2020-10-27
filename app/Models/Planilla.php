@@ -41,7 +41,17 @@ class Planilla extends Model
                 't.apellidoMaterno as trabajador_apellido_materno',
                 'c.Jornal as trabajador_jornal',
                 'c.IdRegimen as trabajador_regimen_id',
-                'o.Descripcion as trabajador_oficio'
+                'o.Descripcion as trabajador_oficio',
+                DB::raw('
+                    CASE
+                        WHEN c.IdRegimen = 2
+                            THEN CAST(ROUND(c.SueldoBase, 2, 0) as decimal(18, 2))
+                        WHEN c.IdRegimen = 3
+                            THEN CAST(ROUND(c.SueldoBase * 1.2638 * 30, 2, 0) as decimal(18, 2))
+                        ELSE
+                            CAST(ROUND(c.SueldoBase * 1.2638, 2, 0) as decimal(18, 2))
+                    END AS trabajador_sueldo_bruto
+                '),
             )
             ->join('Trabajador as t', [
                 'l.idEmpresa'    => 't.idEmpresa',
