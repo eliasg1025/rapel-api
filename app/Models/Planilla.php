@@ -144,51 +144,37 @@ class Planilla extends Model
         return $result;
     }
 
-    public static function getHorasJornal(int $empresaId = 9, $periodo, $zonasLaborId = [])
+    /*
+        * A		PERSONAL AUSENTE
+        * F		FALTA JUSTIFICADA
+        * FE	FERIADO
+        * P		PERSONAL PERMISOS CON
+        * PS	PERSONAL PERMISOS SIN
+        * D		PERSONAL DESCANSOS MEDICOS
+        * DS	PERSONAL DESCANSOS MEDICOS CON SUBSIDIO
+        * PT	PATERNIDAD
+        * M		MATERNIDAD
+        * V		PERSONAL DE VACACIONES
+        * S		PERSONAL SUSPENDIDOS
+        * SP	PERSONAL CON S.P.L
+        * RV	RENUNCIA VOLUNTARIA
+        * TC	TERMINO DE CONTRATO
+        * SPP	SUSPENSION PERIODO DE PRUEBA
+        * DPF	DESPIDO POR IMPUTACION DE FALTAS GRAVES
+        * AT	ABANDONO DE TRABAJO
+        * CF	FALLECIMIENTO
+    */
+    public static function getHorasJornal(int $empresaId = 9, $periodo, $regimenId)
     {
         $periodo = Carbon::parse($periodo);
-        $mes     = $periodo->month;
-        $anio    = $periodo->year;
+        $fechaPrimerDia = $periodo->firstOfMonth()->format('d-m-Y');
 
-        $result = DB::table('Liquidacion as a')
-            ->select(
-                //'c.RutTrabajador as trabajador_id',
-                //'at.IdActividad as id',
-                DB::raw("
-                    CASE
-                        WHEN t.IdTipoDctoIden = 1
-                            THEN RIGHT('000000' + CAST(t.RutTrabajador as varchar), 8)
-                        ELSE
-                            RIGHT('000000' + CAST(t.RutTrabajador as varchar), 9)
-                    END AS trabajador_id
-                "),
-                DB::raw('Cast(p.FechaInicio as date) as fecha'),
-                'p.HoraInasistencia as horas',
-            )
-            ->join('Trabajador as t', [
-                'a.IdEmpresa'    => 't.IdEmpresa',
-                'a.IdTrabajador' => 't.IdTrabajador'
-            ])
-            ->join('Contratos as c', [
-                'a.IdEmpresa'    => 'c.IdEmpresa',
-                'a.IdContrato' => 'c.IdContrato'
-            ])
-            ->leftJoin('PermisosInasistencias as p', [
-                'c.RutTrabajador' => 'p.RutTrabajador'
-            ])
-            ->whereDate('p.FechaInicio', '>=', '2020-10-01')
-            ->whereDate('p.FechaInicio', '<=', '2020-10-16')
-            ->where('c.jornal', false)
-            ->where('p.IndicadorRemuneracion', false)
-            ->where('a.Mes', $mes)
-            ->where('a.Ano', $anio)
-            ->where('a.IdEmpresa', $empresaId)
-            ->when(sizeof($zonasLaborId) !== 0, function ($query) use ($zonasLaborId) {
-                $query->whereIn('t.IdZonaLabores', [$zonasLaborId]);
-            })
-            ->get();
-
-        return $result;
+        try {
+            $result = DB::connection('sqlsrv')->select("SPC_INFORME_HORAS_MENSUALES @EMPRESA = $empresaId, @REGIMEN = $regimenId, @FECHAPRIMERDIA = '$fechaPrimerDia'");
+            return $result;
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
     public static function getHorasNoJornal(int $empresaId = 9, $periodo, $zonasLaborId = [])

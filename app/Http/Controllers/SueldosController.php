@@ -43,16 +43,11 @@ class SueldosController extends Controller
 
     public function getHorasJornal(Request $request)
     {
-        $empresaId    = $request->get('empresaId');
-        $periodo      = $request->get('periodo');
-        $zonasLaborId = $request->get('zonasLaborId');
-        $tipoPago     = $request->get('tipoPago');
+        $empresaId = $request->get('empresaId');
+        $periodo   = $request->get('periodo');
+        $regimenId = $request->get('regimenId');
 
-        if ($tipoPago === 'ANTICIPO') {
-            //$result = Anticipo::get($empresaId, $periodo, $zonasLaborId);
-        } else {
-            $result = Planilla::getHorasJornal($empresaId, $periodo, $zonasLaborId);
-        }
+        $result = Planilla::getHorasJornal($empresaId, $periodo, $regimenId);
 
         return response()->json($result);
     }
