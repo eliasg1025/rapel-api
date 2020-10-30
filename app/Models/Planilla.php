@@ -171,7 +171,11 @@ class Planilla extends Model
 
         try {
             $result = DB::connection('sqlsrv')->select("SPC_INFORME_HORAS_MENSUALES @EMPRESA = $empresaId, @REGIMEN = $regimenId, @FECHAPRIMERDIA = '$fechaPrimerDia'");
-            return $result;
+            return [
+                'mes'  => $periodo->month,
+                'anio' => $periodo->year,
+                'data' => $result,
+            ];
         } catch (\Exception $e) {
             return $e->getMessage();
         }
