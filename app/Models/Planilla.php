@@ -343,6 +343,10 @@ class Planilla extends Model
                 }
             }
 
-        return [...$tmpPermisos, ...$tmpVacaciones, ...$tmpContratosTerminados];
+        return [
+            'mes' => $mes,
+            'anio' => $anio,
+            'data' => [ ...$tmpPermisos, ...$tmpVacaciones, ...$tmpContratosTerminados ]
+        ];
     }
 }
