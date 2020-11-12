@@ -65,6 +65,11 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('/trabajador/{dni:[0-9]+}/info-periodos', 'TrabajadoresController@infoPeriodos');
     $router->get('/trabajador/{dni:[0-9]+}/info-sctr', 'TrabajadoresController@infoSctr');
 
+    $router->get('/variedades/{empresaId:[0-9]+}', 'VariedadesController@index');
+    $router->get('/cuarteles/{empresaId:[0-9]+}', 'CuartelController@index');
+    $router->get('/unidades-medidas/{empresaId:[0-9]+}', 'UnidadesMedidasController@index');
+    $router->get('/labores/{empresaId:[0-9]+}', 'LaborController@index');
+
     $router->group(['prefix' => 'anticipos'], function () use ($router) {
         $router->post('/anticipos', 'AnticiposController@get');
         $router->post('/anticipos/horas/no-dig', 'AnticiposController@getHorasSinDigitacion');
