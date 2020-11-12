@@ -20,10 +20,11 @@ class LaborController extends Controller
                 'a.IdActividad as id',
                 'a.IdEmpresa as empresa_id',
                 'a.Nombre as name',
+                'a.IdFamilia as actividad_id',
                 'a.UnidadMedida as unidad_medida_id'
             )
             ->where('a.IdEmpresa', '=', $empresaId)
-            ->when($unidadMedidaId !== '' && $unidadMedidaId != 0, function($query) use ($unidadMedidaId) {
+            ->when($unidadMedidaId !== '' && $unidadMedidaId !== '0', function($query) use ($unidadMedidaId) {
                 $query->where('a.UnidadMedida', $unidadMedidaId);
             })
             ->get();
