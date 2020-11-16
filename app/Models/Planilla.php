@@ -24,6 +24,7 @@ class Planilla extends Model
                 'ano as anio',
                 'l.idEmpresa as empresa_id',
                 'l.idZona as zona_id',
+                DB::raw("'1' as tipo_pago_id"),
                 DB::raw('CAST(ROUND(MontoAPagar, 2, 0) as decimal(18, 2)) as monto'),
                 DB::raw("
                     CASE
@@ -90,6 +91,7 @@ class Planilla extends Model
             ->select(
                 'dl.IdDetalle as id',
                 'l.idLiquidacion as liquidacion_id',
+                DB::raw("'1' as tipo_pago_id"),
                 DB::raw("(CAST(co.IdConcepto AS NVARCHAR(8)) + ' ' + co.Descripcion) as concepto"),
                 DB::raw("
                     CAST((

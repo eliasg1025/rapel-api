@@ -17,7 +17,7 @@ class SueldosController extends Controller
         $tipoPago     = $request->get('tipoPago');
 
         if ($tipoPago === 'ANTICIPO') {
-            //$result = Anticipo::get($empresaId, $periodo, $zonasLaborId);
+            $result = Anticipo::get($empresaId, $periodo, $zonasLaborId);
         } else {
             $result = Planilla::get($empresaId, $periodo, $zonasLaborId);
         }
@@ -33,7 +33,7 @@ class SueldosController extends Controller
         $tipoPago     = $request->get('tipoPago');
 
         if ($tipoPago === 'ANTICIPO') {
-            //$result = Anticipo::get($empresaId, $periodo, $zonasLaborId);
+            $result = Anticipo::getDetalle($empresaId, $periodo, $zonasLaborId);
         } else {
             $result = Planilla::getDetalle($empresaId, $periodo, $zonasLaborId);
         }
