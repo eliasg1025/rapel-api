@@ -243,7 +243,7 @@ class Anticipo extends Model
             l.Mes, l.Ano
             ,a.IdAnticipo
             FROM [bsis_rem_afr].[dbo].[Liquidacion] as l
-            left join [dbo].[Anticipos] as a on a.IdEmpresa = l.IdEmpresa and a.Mes = l.Mes and a.Ano = l.Ano and a.IdTrabajador = l.IdTrabajador
+            inner join [dbo].[Anticipos] as a on a.IdEmpresa = l.IdEmpresa and a.Mes = l.Mes and a.Ano = l.Ano and a.IdTrabajador = l.IdTrabajador
             inner join [dbo].[Detalleliquidacion] as dl on dl.IdLiquidacion = l.IdLiquidacion and dl.IdEmpresa = l.IdEmpresa
             inner join [dbo].[ConceptosHaberDescuento] as con on con.IdEmpresa = dl.IdEmpresa and con.IdConcepto = dl.IdConcepto
             where l.IdEmpresa = $empresaId and l.Mes = $mes and l.Ano = $anio and con.Descripcion like '%BONO%'
