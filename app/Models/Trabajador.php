@@ -135,11 +135,14 @@ class Trabajador extends Model
             $alertas = AlertaTrabajador::get($dni);
             $contratos = Contrato::byPeriodo($dni);
 
-            if ( sizeof($contratos) === 0 ) {
-                throw new Error('Esta persona no tiene contratos');
+            if ( sizeof($contratos) !== 0 ) {
+                //throw new Error('Esta persona no tiene contratos');
+                $ultimoContrato = $contratos[0];
+                $empresasId = [$ultimoContrato->empresa_id];
+            } else {
+                $empresasId = [9, 14];
             }
 
-            $ultimoContrato = $contratos[0];
 
             $trabajador = DB::table('dbo.Trabajador as t')
                 ->select(
@@ -166,10 +169,12 @@ class Trabajador extends Model
                     't.IdZonaLabores' => 'z.IdZona'
                 ])
                 ->where('RutTrabajador', $dni)
-                ->whereIn('t.IdEmpresa', [$ultimoContrato->empresa_id])
+                ->whereIn('t.IdEmpresa', $empresasId)
                 ->first();
 
-            $ultimoContrato->zona_labor = !is_null($trabajador->zona_labor) ? $trabajador->zona_labor : $ultimoContrato->zona_labor;
+            if ( sizeof($contratos) !== 0 ) {
+                $ultimoContrato->zona_labor = !is_null($trabajador->zona_labor) ? $trabajador->zona_labor : $ultimoContrato->zona_labor;
+            }
 
             return [
                 'rut' => $dni,
@@ -179,7 +184,7 @@ class Trabajador extends Model
             ];
         } catch (\Exception $e) {
             return [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage() . ' -- ' . $e->getLine()
             ];
         }
     }
