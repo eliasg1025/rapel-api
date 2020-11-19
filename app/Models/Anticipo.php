@@ -420,7 +420,7 @@ class Anticipo extends Model
             foreach ($periodo as $p) {
                 array_push($tmpContratosTerminados, [
                     'fecha' => $p->toDateString(),
-                    'horas' => 0,
+                    'horas' => 8,
                     'trabajador_id' => $contratoTerminado->trabajador_id,
                     'motivo' => 'A',
                     'con_goce' => '0'
@@ -464,7 +464,7 @@ class Anticipo extends Model
             foreach ($periodo as $p) {
                 array_push($tmpAunSinContrato, [
                     'fecha' => $p->toDateString(),
-                    'horas' => 0,
+                    'horas' => 8,
                     'trabajador_id' => $contrato->trabajador_id,
                     'motivo' => 'A',
                     'con_goce' => '0'
