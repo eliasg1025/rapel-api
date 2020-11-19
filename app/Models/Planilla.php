@@ -382,7 +382,7 @@ class Planilla extends Model
                     'fecha' => $p->toDateString(),
                     'horas' => 0,
                     'trabajador_id' => $contrato->trabajador_id,
-                    'motivo' => '-',
+                    'motivo' => 'A',
                     'con_goce' => '0'
                 ]);
             }
