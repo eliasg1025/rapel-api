@@ -413,25 +413,69 @@ class Anticipo extends Model
             ->whereBetween('c.FechaTermino', [$fechaPrimerDia->format('Ymd h:i:s'), $fechaUltimoDia->format('Ymd h:i:s')])
             ->get()->toArray();
 
-            $tmpContratosTerminados = [];
-            foreach ($contratosTerminados as $contratoTerminado) {
-                $periodo = CarbonPeriod::create($contratoTerminado->fecha_termino, $fechaUltimoDia);
+        $tmpContratosTerminados = [];
+        foreach ($contratosTerminados as $contratoTerminado) {
+            $periodo = CarbonPeriod::create($contratoTerminado->fecha_termino, $fechaUltimoDia);
 
-                foreach ($periodo as $p) {
-                    array_push($tmpContratosTerminados, [
-                        'fecha' => $p->toDateString(),
-                        'horas' => 0,
-                        'trabajador_id' => $contratoTerminado->trabajador_id,
-                        'motivo' => 'A',
-                        'con_goce' => '0'
-                    ]);
-                }
+            foreach ($periodo as $p) {
+                array_push($tmpContratosTerminados, [
+                    'fecha' => $p->toDateString(),
+                    'horas' => 0,
+                    'trabajador_id' => $contratoTerminado->trabajador_id,
+                    'motivo' => 'A',
+                    'con_goce' => '0'
+                ]);
             }
+        }
+
+        $aunSinContrato = DB::table('Anticipos as a')
+            ->select(
+                DB::raw("
+                    CASE
+                        WHEN t.IdTipoDctoIden = 1
+                            THEN RIGHT('000000' + CAST(t.RutTrabajador as varchar), 8)
+                        ELSE
+                            RIGHT('000000' + CAST(t.RutTrabajador as varchar), 9)
+                    END AS trabajador_id
+                "),
+                DB::raw("cast(c.FechaInicioPeriodo as date) as fecha_inicio")
+            )
+            ->join('Trabajador as t', [
+                'a.IdEmpresa'    => 't.IdEmpresa',
+                'a.idTrabajador' => 't.idTrabajador'
+            ])
+            ->join('Contratos as c', [
+                'c.idEmpresa' => 'a.idEmpresa',
+                'c.idTrabajador' => 'a.idTrabajador'
+            ])
+            ->where('a.IdEmpresa', $empresaId)
+            ->where('c.jornal', false)
+            ->where('c.IndicadorVigencia', 1)
+            ->where('a.Mes', $mes)
+            ->where('a.Ano', $anio)
+            ->whereBetween('c.FechaInicioPeriodo', [$fechaPrimerDia->format('Ymd h:i:s'), $fechaUltimoDia->format('Ymd h:i:s')])
+            ->get()->toArray();
+
+        $tmpAunSinContrato = [];
+        foreach ($aunSinContrato as $contrato) {
+            $hasta = Carbon::parse($contrato->fecha_inicio)->subDay();
+            $periodo = CarbonPeriod::create($fechaPrimerDia, $hasta);
+
+            foreach ($periodo as $p) {
+                array_push($tmpAunSinContrato, [
+                    'fecha' => $p->toDateString(),
+                    'horas' => 0,
+                    'trabajador_id' => $contrato->trabajador_id,
+                    'motivo' => '-',
+                    'con_goce' => '0'
+                ]);
+            }
+        }
 
         return [
             'mes' => $mes,
             'anio' => $anio,
-            'data' => [ ...$tmpPermisos, ...$tmpVacaciones, ...$tmpContratosTerminados ]
+            'data' => [ ...$tmpPermisos, ...$tmpVacaciones, ...$tmpContratosTerminados, ...$tmpAunSinContrato ]
         ];
     }
 }

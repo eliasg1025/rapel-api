@@ -345,10 +345,54 @@ class Planilla extends Model
                 }
             }
 
+        $aunSinContrato = DB::table('Liquidacion as l')
+            ->select(
+                DB::raw("
+                    CASE
+                        WHEN t.IdTipoDctoIden = 1
+                            THEN RIGHT('000000' + CAST(t.RutTrabajador as varchar), 8)
+                        ELSE
+                            RIGHT('000000' + CAST(t.RutTrabajador as varchar), 9)
+                    END AS trabajador_id
+                "),
+                DB::raw("cast(c.FechaInicioPeriodo as date) as fecha_inicio")
+            )
+            ->join('Trabajador as t', [
+                'l.IdEmpresa'    => 't.IdEmpresa',
+                'l.idTrabajador' => 't.idTrabajador'
+            ])
+            ->join('Contratos as c', [
+                'c.idEmpresa' => 'l.idEmpresa',
+                'c.idContrato' => 'l.idContrato'
+            ])
+            ->where('l.IdEmpresa', $empresaId)
+            ->where('c.jornal', false)
+            ->where('l.Mes', $mes)
+            ->where('l.Ano', $anio)
+            ->whereBetween('c.FechaInicioPeriodo', [$fechaPrimerDia->format('Ymd h:i:s'), $fechaUltimoDia->format('Ymd h:i:s')])
+            ->get()->toArray();
+
+        $tmpAunSinContrato = [];
+        foreach ($aunSinContrato as $contrato) {
+            $hasta = Carbon::parse($contrato->fecha_inicio)->subDay();
+            $periodo = CarbonPeriod::create($fechaPrimerDia, $hasta);
+
+            foreach ($periodo as $p) {
+                array_push($tmpAunSinContrato, [
+                    'fecha' => $p->toDateString(),
+                    'horas' => 0,
+                    'trabajador_id' => $contrato->trabajador_id,
+                    'motivo' => '-',
+                    'con_goce' => '0'
+                ]);
+            }
+        }
+
         return [
             'mes' => $mes,
             'anio' => $anio,
-            'data' => [ ...$tmpPermisos, ...$tmpVacaciones, ...$tmpContratosTerminados ]
+            'data' => [ ...$tmpPermisos, ...$tmpVacaciones, ...$tmpContratosTerminados, ...$tmpAunSinContrato ]
+            //'data' => [ ...$tmpAunSinContrato ]
         ];
     }
 }
