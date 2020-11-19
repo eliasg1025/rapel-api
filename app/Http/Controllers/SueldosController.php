@@ -56,8 +56,13 @@ class SueldosController extends Controller
     {
         $empresaId    = $request->get('empresaId');
         $periodo      = $request->get('periodo');
+        $tipoPago     = $request->get('tipoPago');
 
-        $result = Planilla::getHorasNoJornal($empresaId, $periodo);
+        if ($tipoPago === 'ANTICIPO') {
+            $result = Anticipo::getHorasNoJornal($empresaId, $periodo);
+        } else {
+            $result = Planilla::getHorasNoJornal($empresaId, $periodo);
+        }
 
         return response()->json($result);
     }

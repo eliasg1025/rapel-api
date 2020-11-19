@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -261,5 +262,176 @@ class Anticipo extends Model
         }
 
         return $detalles;
+    }
+
+    public static function getHorasNoJornal(int $empresaId = 9, $periodo)
+    {
+        $periodo        = Carbon::parse($periodo);
+        $mes            = $periodo->month;
+        $anio           = $periodo->year;
+        $fechaPrimerDia = clone $periodo->firstOfMonth();
+        $fechaUltimoDia = clone $periodo->lastOfMonth();
+
+        $permisosQuery = DB::table('Anticipos as a')
+            ->select(
+                //'c.RutTrabajador as trabajador_id',
+                //'at.IdActividad as id',
+                DB::raw("
+                    CASE
+                        WHEN t.IdTipoDctoIden = 1
+                            THEN RIGHT('000000' + CAST(t.RutTrabajador as varchar), 8)
+                        ELSE
+                            RIGHT('000000' + CAST(t.RutTrabajador as varchar), 9)
+                    END AS trabajador_id
+                "),
+                DB::raw('Cast(p.FechaInicio as date) as fecha'),
+                'p.HoraInasistencia as horas',
+                DB::raw("
+                    CASE
+                        WHEN p.MotivoAusencia = 'FALTA' THEN 'A'
+                        WHEN P.MOTIVOAUSENCIA = 'PERSONAL SUSPENDIDOS' THEN 'S'
+                        WHEN P.MOTIVOAUSENCIA = 'PERSONAL CON S.P.L' THEN 'SP'
+                        WHEN P.MOTIVOAUSENCIA = 'PERMISO' THEN 'PS'
+                        WHEN P.MOTIVOAUSENCIA = 'PERMISO CON' THEN 'P'
+                        WHEN P.MOTIVOAUSENCIA = 'FALTA JUSTIFICADA' THEN 'F'
+                        ELSE (
+                            CASE WHEN P.MOTIVOAUSENCIA='LICENCIA' AND P.TIPOLICENCIA = 6 THEN 'PT'
+                            WHEN P.MOTIVOAUSENCIA='LICENCIA' AND P.TIPOLICENCIA=2 THEN 'M'
+                            WHEN P.MOTIVOAUSENCIA='LICENCIA' AND P.TIPOLICENCIA<>2 AND P.TIPOLICENCIA<>6  AND P.IMPORTE='1 Basico Diario'THEN 'D'
+                            WHEN P.MOTIVOAUSENCIA='LICENCIA' AND P.TIPOLICENCIA<>2 AND P.TIPOLICENCIA<>6 AND P.IMPORTE='2 Subsidio Diario' THEN 'DS'
+                            END
+                        )
+                        END AS motivo
+                "),
+                'p.IndicadorRemuneracion as con_goce'
+            )
+            ->join('Trabajador as t', [
+                'a.IdEmpresa'    => 't.IdEmpresa',
+                'a.IdTrabajador' => 't.IdTrabajador'
+            ])
+            ->join('Contratos as c', [
+                'a.IdEmpresa'    => 'c.IdEmpresa',
+                'a.IdTrabajador' => 'c.IdTrabajador'
+            ])
+            ->leftJoin('PermisosInasistencias as p', [
+                'c.RutTrabajador' => 'p.RutTrabajador'
+            ])
+            ->whereDate('p.FechaInicio', '>=', $fechaPrimerDia)
+            ->whereDate('p.FechaInicio', '<=', $fechaUltimoDia)
+            ->where('c.jornal', false)
+            ->where('c.IndicadorVigencia', 1)
+            //->where('p.IndicadorRemuneracion', false)
+            ->where('a.Mes', $mes)
+            ->where('a.Ano', $anio)
+            ->where('a.IdEmpresa', $empresaId);
+
+        $tmpPermisos = $permisosQuery->get()->toArray();
+
+        $vacacionesQuery = DB::table('Anticipos as a')
+            ->select(
+                'v.IdVacacion as vacacion_id',
+                DB::raw("
+                    CASE
+                        WHEN t.IdTipoDctoIden = 1
+                            THEN RIGHT('000000' + CAST(t.RutTrabajador as varchar), 8)
+                        ELSE
+                            RIGHT('000000' + CAST(t.RutTrabajador as varchar), 9)
+                    END AS trabajador_id
+                "),
+                DB::raw('Cast(v.FechaInicio as date) as fecha_inicio'),
+                DB::raw('Cast(v.FechaFinal as date) as fecha_fin'),
+                'c.IdContrato as contrato_id',
+                'a.IdAnticipo as liquidacion_id',
+                'a.idEmpresa as empresa_id',
+                //DB::raw('Cast(p.FechaInicio as date) as fecha'),
+            )
+            ->join('Trabajador as t', [
+                'a.IdEmpresa'    => 't.IdEmpresa',
+                'a.idTrabajador' => 't.idTrabajador'
+            ])
+            ->join('Contratos as c', [
+                'c.idEmpresa' => 'a.idEmpresa',
+                'c.idTrabajador' => 'a.idTrabajador'
+            ])
+            ->join('Vacaciones as v', [
+                'v.idEmpresa' => 'a.idEmpresa',
+                'v.idTrabajador' => 'a.idTrabajador'
+            ])
+            ->where('c.jornal', false)
+            ->where('a.Mes', $mes)
+            ->where('a.Ano', $anio)
+            ->where('a.IdEmpresa', $empresaId)
+            ->where('c.IndicadorVigencia', 1)
+            ->where(function($query) use ($fechaPrimerDia, $fechaUltimoDia) {
+                $query->whereBetween('v.FechaInicio', [$fechaPrimerDia->format('Ymd h:i:s'), $fechaUltimoDia->format('Ymd h:i:s')]);
+                $query->orWhereBetween('v.FechaFinal', [$fechaPrimerDia->format('Ymd h:i:s'), $fechaUltimoDia->format('Ymd h:i:s')]);
+            });
+
+        $vacaciones = $vacacionesQuery->get();
+
+        $tmpVacaciones = [];
+        foreach ($vacaciones as $vacacion) {
+            $fechaFin = Carbon::parse($vacacion->fecha_fin)->lessThanOrEqualTo($fechaUltimoDia) ? $vacacion->fecha_fin : $fechaUltimoDia;
+            $period = CarbonPeriod::create($vacacion->fecha_inicio, $fechaFin);
+
+            foreach ($period as $p) {
+                array_push($tmpVacaciones, [
+                    'fecha' => $p->toDateString(),
+                    'horas' => 8,
+                    'trabajador_id' => $vacacion->trabajador_id,
+                    'motivo' => 'V',
+                    'con_goce' => "1"
+                ]);
+            }
+        }
+
+        $contratosTerminados = DB::table('Anticipos as a')
+            ->select(
+                DB::raw("
+                    CASE
+                        WHEN t.IdTipoDctoIden = 1
+                            THEN RIGHT('000000' + CAST(t.RutTrabajador as varchar), 8)
+                        ELSE
+                            RIGHT('000000' + CAST(t.RutTrabajador as varchar), 9)
+                    END AS trabajador_id
+                "),
+                DB::raw("cast(c.FechaTermino as date) as fecha_termino")
+            )
+            ->join('Trabajador as t', [
+                'a.IdEmpresa'    => 't.IdEmpresa',
+                'a.idTrabajador' => 't.idTrabajador'
+            ])
+            ->join('Contratos as c', [
+                'c.idEmpresa' => 'a.idEmpresa',
+                'c.idTrabajador' => 'a.idTrabajador'
+            ])
+            ->where('a.IdEmpresa', $empresaId)
+            ->where('c.jornal', false)
+            ->where('c.IndicadorVigencia', 1)
+            ->where('a.Mes', $mes)
+            ->where('a.Ano', $anio)
+            ->whereBetween('c.FechaTermino', [$fechaPrimerDia->format('Ymd h:i:s'), $fechaUltimoDia->format('Ymd h:i:s')])
+            ->get()->toArray();
+
+            $tmpContratosTerminados = [];
+            foreach ($contratosTerminados as $contratoTerminado) {
+                $periodo = CarbonPeriod::create($contratoTerminado->fecha_termino, $fechaUltimoDia);
+
+                foreach ($periodo as $p) {
+                    array_push($tmpContratosTerminados, [
+                        'fecha' => $p->toDateString(),
+                        'horas' => 0,
+                        'trabajador_id' => $contratoTerminado->trabajador_id,
+                        'motivo' => 'A',
+                        'con_goce' => '0'
+                    ]);
+                }
+            }
+
+        return [
+            'mes' => $mes,
+            'anio' => $anio,
+            'data' => [ ...$tmpPermisos, ...$tmpVacaciones, ...$tmpContratosTerminados ]
+        ];
     }
 }
