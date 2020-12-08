@@ -395,7 +395,7 @@ class Trabajador extends Model
                             THEN CAST(ROUND(c.SueldoBase * 1.2638 * 30, 2, 0) as decimal(18, 2))
                         ELSE
                             CAST(ROUND(c.SueldoBase * 1.2638, 2, 0) as decimal(18, 2))
-                    END AS trabajador_sueldo_bruto
+                    END AS sueldo_bruto
                 '),
                 'o.Descripcion as oficio',
                 'c.Jornal as jornal',
