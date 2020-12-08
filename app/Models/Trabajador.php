@@ -376,15 +376,30 @@ class Trabajador extends Model
     {
         return DB::table('dbo.Contratos as c')
             ->select(
-                't.IdEmpresa',
-                't.RutTrabajador',
-                't.Nombre',
-                't.ApellidoPaterno',
-                't.ApellidoMaterno',
-                't.NumeroCuentaBancaria',
-                'b.Nombre as Banco',
-                'o.Descripcion as Oficio',
-                'c.Jornal'
+                DB::raw("
+                    CASE
+                        WHEN t.IdTipoDctoIden = 1
+                            THEN RIGHT('000000' + CAST(t.RutTrabajador as varchar), 8)
+                        ELSE
+                            RIGHT('000000' + CAST(t.RutTrabajador as varchar), 9)
+                    END AS id
+                "),
+                't.Nombre as nombre',
+                't.ApellidoPaterno as apellido_paterno',
+                't.ApellidoMaterno as apellido_materno',
+                DB::raw('
+                    CASE
+                        WHEN c.IdRegimen = 2
+                            THEN CAST(ROUND(c.SueldoBase, 2, 0) as decimal(18, 2))
+                        WHEN c.IdRegimen = 3
+                            THEN CAST(ROUND(c.SueldoBase * 1.2638 * 30, 2, 0) as decimal(18, 2))
+                        ELSE
+                            CAST(ROUND(c.SueldoBase * 1.2638, 2, 0) as decimal(18, 2))
+                    END AS trabajador_sueldo_bruto
+                '),
+                'o.Descripcion as oficio',
+                'c.Jornal as jornal',
+                'c.IdRegimen as regimen_id'
             )
             ->join('dbo.Trabajador as t', [
                 't.IdEmpresa' => 'c.IdEmpresa',
