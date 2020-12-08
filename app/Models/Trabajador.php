@@ -399,7 +399,8 @@ class Trabajador extends Model
                 '),
                 'o.Descripcion as oficio',
                 'c.Jornal as jornal',
-                'c.IdRegimen as regimen_id'
+                'c.IdRegimen as regimen_id',
+                'c.IdEmpresa as empresa_id'
             )
             ->join('dbo.Trabajador as t', [
                 't.IdEmpresa' => 'c.IdEmpresa',
