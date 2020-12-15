@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Error;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -17,6 +18,10 @@ class Trabajador extends Model
     {
         try {
             $t =  Trabajador::where('RutTrabajador', $dni)->whereIn('IdEmpresa', ['9', '14'])->orderBy('IdTrabajador', 'DESC')->first();
+
+            if (!$t) {
+               throw new Exception('No se encontro trabajador');
+            }
 
             $alertas = AlertaTrabajador::get($dni);
             $contrato_activo = Contrato::activo($dni, $activo, $info_jornal);
