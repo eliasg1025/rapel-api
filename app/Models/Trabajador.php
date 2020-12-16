@@ -426,6 +426,7 @@ class Trabajador extends Model
                 $query->where('c.IdEmpresa', $empresaId);
             })
             ->where('c.IndicadorVigencia', true)
+            ->where('c.FechaTermino', null)
             ->get();
     }
 
