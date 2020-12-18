@@ -249,10 +249,10 @@ class Anticipo extends Model
             inner join [dbo].[ConceptosHaberDescuento] as con on con.IdEmpresa = dl.IdEmpresa and con.IdConcepto = dl.IdConcepto
             where l.IdEmpresa = $empresaId and l.Mes = $mes and l.Ano = $anio and (con.Descripcion like '%BONO%' or con.Descripcion like '%REINTEGRO%')
         ");
-
+        
         foreach ($bonos as $bono) {
             array_push($detalles, [
-                'id'            => $row->IdAnticipo . $bono->IdDetalle,
+                'id'            => $bono->IdDetalle,
                 'concepto'      => $bono->Descripcion,
                 'monto'         => round($bono->Monto, 2),
                 'tipo'          => 1,
