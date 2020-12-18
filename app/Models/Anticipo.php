@@ -252,7 +252,7 @@ class Anticipo extends Model
 
         foreach ($bonos as $bono) {
             array_push($detalles, [
-                'id'            => $bono->IdDetalle,
+                'id'            => $row->IdAnticipo . $bono->IdDetalle,
                 'concepto'      => $bono->Descripcion,
                 'monto'         => round($bono->Monto, 2),
                 'tipo'          => 1,

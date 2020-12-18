@@ -140,6 +140,7 @@ class Planilla extends Model
                     co.Total = 0 or dl.idconcepto in (251,287,505,504,101,560,581,141,288,285,286,248,503)
                 )
             ")
+            ->where('co.Descripcion', 'not like', '%SEMANA CORRIDA%')
             ->when(sizeof($zonasLaborId) !== 0, function ($query) use ($zonasLaborId) {
                 $query->whereIn('t.IdZonaLabores', $zonasLaborId);
             })->get();
