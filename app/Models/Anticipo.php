@@ -218,7 +218,7 @@ class Anticipo extends Model
 
         $bonos = DB::select("
             SELECT
-                l.RutTrabajador
+                l.RutTrabajador,
                 dl.*,
                 con.Descripcion,
                 l.Mes,
