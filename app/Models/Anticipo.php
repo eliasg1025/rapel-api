@@ -132,107 +132,74 @@ class Anticipo extends Model
         {
             //dd($row);
             array_push($detalles, [
-                'id'            => $row->IdAnticipo . '001',
                 'concepto'      => 'SUELDO A LA FECHA',
                 'monto'         => round($row->SueldoAlaFecha, 2),
                 'tipo'          => 1,
-                'liquidacion_id'       => $row->IdAnticipo,
-                'tipo_pago_id'  => '2'
             ]);
 
             array_push($detalles, [
-                'id'            => $row->IdAnticipo . '002',
                 'concepto'      => 'TOTAL FERIADOS',
                 'monto'         => round($row->TotalFeriados, 2),
                 'tipo'          => 1,
-                'liquidacion_id'       => $row->IdAnticipo,
-                'tipo_pago_id'  => '2'
             ]);
 
             array_push($detalles, [
-                'id'            => $row->IdAnticipo . '003',
                 'concepto'      => 'TOTAL HORAS EXTRA',
                 'monto'         => round($row->HoraExtra, 2),
                 'tipo'          => 1,
-                'liquidacion_id'       => $row->IdAnticipo,
-                'tipo_pago_id'  => '2'
             ]);
 
             if ($row->TotalCargas > 0) {
                 array_push($detalles, [
-                    'id'            => $row->IdAnticipo . '004',
                     'concepto'      => '150 ASIG. FAMILIAR',
                     'monto'         => round($row->TotalCargas, 2),
                     'tipo'          => 1,
-                    'liquidacion_id'       => $row->IdAnticipo,
-                    'tipo_pago_id'  => '2'
                 ]);
             }
 
             array_push($detalles, [
-                'id'            => $row->IdAnticipo . '005',
                 'concepto'      => 'TOTAL DOMINGOS',
                 'monto'         => round($row->TotalDomingos, 2),
                 'tipo'          => 1,
-                'liquidacion_id'       => $row->IdAnticipo,
-                'tipo_pago_id'  => '2'
             ]);
 
             if ($row->Bono_Labor > 0) {
                 array_push($detalles, [
-                    'id'            => $row->IdAnticipo . '006',
                     'concepto'      => 'BONO LABOR',
                     'monto'         => round($row->Bono_Labor, 2),
                     'tipo'          => 1,
-                    'liquidacion_id'       => $row->IdAnticipo,
-                    'tipo_pago_id'  => '2'
                 ]);
             }
 
             array_push($detalles, [
-                'id'            => $row->IdAnticipo . '007',
                 'concepto'      => 'CTS AGRARIA',
                 'monto'         => round($row->CtsAgraria, 2),
                 'tipo'          => 1,
-                'liquidacion_id'       => $row->IdAnticipo,
-                'tipo_pago_id'  => '2'
             ]);
 
             array_push($detalles, [
-                'id'            => $row->IdAnticipo . '008',
                 'concepto'      => 'GRATIFIACION AGRARIA',
                 'monto'         => round($row->GratificacionAgraria, 2),
                 'tipo'          => 1,
-                'liquidacion_id'       => $row->IdAnticipo,
-                'tipo_pago_id'  => '2'
             ]);
 
             array_push($detalles, [
-                'id'            => $row->IdAnticipo . '009',
                 'concepto'      => 'TOTAL AFP / ONP',
                 'monto'         => round($row->MontoAfp, 2),
                 'tipo'          => 0,
-                'liquidacion_id'       => $row->IdAnticipo,
-                'tipo_pago_id'  => '2'
             ]);
 
             array_push($detalles, [
-                'id'            => $row->IdAnticipo . '010',
                 'concepto'      => 'OTROS DESCUENTOS',
                 'monto'         => round($row->OtrosDescuentos, 2),
                 'tipo'          => 0,
-                'liquidacion_id'       => $row->IdAnticipo,
-                'tipo_pago_id'  => '2'
             ]);
 
             if ($row->Impuesto > 0) {
                 array_push($detalles, [
-                    'id'            => $row->IdAnticipo . '011',
                     'concepto'      => 'IMPUESTO 5TA CATEGORIA',
                     'monto'         => round($row->Impuesto, 2),
                     'tipo'          => 0,
-                    'liquidacion_id'       => $row->IdAnticipo,
-                    'tipo_pago_id'  => '2'
                 ]);
             }
         }
@@ -249,15 +216,12 @@ class Anticipo extends Model
             inner join [dbo].[ConceptosHaberDescuento] as con on con.IdEmpresa = dl.IdEmpresa and con.IdConcepto = dl.IdConcepto
             where l.IdEmpresa = $empresaId and l.Mes = $mes and l.Ano = $anio and (con.Descripcion like '%BONO%' or con.Descripcion like '%REINTEGRO%')
         ");
-        
+
         foreach ($bonos as $bono) {
             array_push($detalles, [
-                'id'            => $bono->IdDetalle,
                 'concepto'      => $bono->Descripcion,
                 'monto'         => round($bono->Monto, 2),
                 'tipo'          => 1,
-                'liquidacion_id'       => $bono->IdAnticipo,
-                'tipo_pago_id'  => '2'
             ]);
         }
 
