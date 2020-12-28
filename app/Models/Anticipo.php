@@ -95,6 +95,7 @@ class Anticipo extends Model
         $anticipos = DB::select(
             "
             SELECT
+                T.RutTrabajador,
                 A.IdAnticipo,A.IdTrabajador as [Id Trabajador],
                 A.Monto AS Monto,
                 AD.SueldoAlaFecha,
@@ -132,18 +133,21 @@ class Anticipo extends Model
         {
             //dd($row);
             array_push($detalles, [
+                'trabajador_id' => $row->RutTrabajador,
                 'concepto'      => 'SUELDO A LA FECHA',
                 'monto'         => round($row->SueldoAlaFecha, 2),
                 'tipo'          => 1,
             ]);
 
             array_push($detalles, [
+                'trabajador_id' => $row->RutTrabajador,
                 'concepto'      => 'TOTAL FERIADOS',
                 'monto'         => round($row->TotalFeriados, 2),
                 'tipo'          => 1,
             ]);
 
             array_push($detalles, [
+                'trabajador_id' => $row->RutTrabajador,
                 'concepto'      => 'TOTAL HORAS EXTRA',
                 'monto'         => round($row->HoraExtra, 2),
                 'tipo'          => 1,
@@ -151,6 +155,7 @@ class Anticipo extends Model
 
             if ($row->TotalCargas > 0) {
                 array_push($detalles, [
+                    'trabajador_id' => $row->RutTrabajador,
                     'concepto'      => '150 ASIG. FAMILIAR',
                     'monto'         => round($row->TotalCargas, 2),
                     'tipo'          => 1,
@@ -158,6 +163,7 @@ class Anticipo extends Model
             }
 
             array_push($detalles, [
+                'trabajador_id' => $row->RutTrabajador,
                 'concepto'      => 'TOTAL DOMINGOS',
                 'monto'         => round($row->TotalDomingos, 2),
                 'tipo'          => 1,
@@ -165,6 +171,7 @@ class Anticipo extends Model
 
             if ($row->Bono_Labor > 0) {
                 array_push($detalles, [
+                    'trabajador_id' => $row->RutTrabajador,
                     'concepto'      => 'BONO LABOR',
                     'monto'         => round($row->Bono_Labor, 2),
                     'tipo'          => 1,
@@ -172,24 +179,28 @@ class Anticipo extends Model
             }
 
             array_push($detalles, [
+                'trabajador_id' => $row->RutTrabajador,
                 'concepto'      => 'CTS AGRARIA',
                 'monto'         => round($row->CtsAgraria, 2),
                 'tipo'          => 1,
             ]);
 
             array_push($detalles, [
+                'trabajador_id' => $row->RutTrabajador,
                 'concepto'      => 'GRATIFIACION AGRARIA',
                 'monto'         => round($row->GratificacionAgraria, 2),
                 'tipo'          => 1,
             ]);
 
             array_push($detalles, [
+                'trabajador_id' => $row->RutTrabajador,
                 'concepto'      => 'TOTAL AFP / ONP',
                 'monto'         => round($row->MontoAfp, 2),
                 'tipo'          => 0,
             ]);
 
             array_push($detalles, [
+                'trabajador_id' => $row->RutTrabajador,
                 'concepto'      => 'OTROS DESCUENTOS',
                 'monto'         => round($row->OtrosDescuentos, 2),
                 'tipo'          => 0,
@@ -197,6 +208,7 @@ class Anticipo extends Model
 
             if ($row->Impuesto > 0) {
                 array_push($detalles, [
+                    'trabajador_id' => $row->RutTrabajador,
                     'concepto'      => 'IMPUESTO 5TA CATEGORIA',
                     'monto'         => round($row->Impuesto, 2),
                     'tipo'          => 0,
@@ -206,10 +218,12 @@ class Anticipo extends Model
 
         $bonos = DB::select("
             SELECT
-            dl.*,
-            con.Descripcion,
-            l.Mes, l.Ano
-            ,a.IdAnticipo
+                l.RutTrabajador
+                dl.*,
+                con.Descripcion,
+                l.Mes,
+                l.Ano,
+                a.IdAnticipo
             FROM [bsis_rem_afr].[dbo].[Liquidacion] as l
             inner join [dbo].[Anticipos] as a on a.IdEmpresa = l.IdEmpresa and a.Mes = l.Mes and a.Ano = l.Ano and a.IdTrabajador = l.IdTrabajador
             inner join [dbo].[Detalleliquidacion] as dl on dl.IdLiquidacion = l.IdLiquidacion and dl.IdEmpresa = l.IdEmpresa
@@ -219,6 +233,7 @@ class Anticipo extends Model
 
         foreach ($bonos as $bono) {
             array_push($detalles, [
+                'trabajador_id' => $bono->RutTrabajador,
                 'concepto'      => $bono->Descripcion,
                 'monto'         => round($bono->Monto, 2),
                 'tipo'          => 1,

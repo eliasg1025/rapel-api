@@ -89,6 +89,7 @@ class Planilla extends Model
 
         $result = DB::table('Liquidacion as l')
             ->select(
+                'l.RutTrabajador as trabajador_id',
                 DB::raw("(CAST(co.IdConcepto AS NVARCHAR(8)) + ' ' + co.Descripcion) as concepto"),
                 DB::raw("
                     CAST((
