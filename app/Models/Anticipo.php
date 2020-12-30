@@ -225,7 +225,12 @@ class Anticipo extends Model
 
         $bonos = DB::select("
             SELECT
-                l.RutTrabajador,
+                CASE
+                    WHEN t.IdTipoDctoIden = 1
+                        THEN RIGHT('000000' + CAST(t.RutTrabajador as varchar), 8)
+                    ELSE
+                        RIGHT('000000' + CAST(t.RutTrabajador as varchar), 9)
+                END AS RutTrabajador,
                 dl.*,
                 con.Descripcion,
                 l.Mes,
@@ -235,6 +240,7 @@ class Anticipo extends Model
             inner join [dbo].[Anticipos] as a on a.IdEmpresa = l.IdEmpresa and a.Mes = l.Mes and a.Ano = l.Ano and a.IdTrabajador = l.IdTrabajador
             inner join [dbo].[Detalleliquidacion] as dl on dl.IdLiquidacion = l.IdLiquidacion and dl.IdEmpresa = l.IdEmpresa
             inner join [dbo].[ConceptosHaberDescuento] as con on con.IdEmpresa = dl.IdEmpresa and con.IdConcepto = dl.IdConcepto
+            inner join [dbo].[Trabajador] as t on t.IdEmpresa = l.IdEmpresa and t.RutTrabajador = l.RutTrabajador
             where l.IdEmpresa = $empresaId and l.Mes = $mes and l.Ano = $anio and (con.Descripcion like '%BONO%' or con.Descripcion like '%REINTEGRO%')
         ");
 
