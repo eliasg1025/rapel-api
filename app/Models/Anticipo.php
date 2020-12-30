@@ -117,7 +117,9 @@ class Anticipo extends Model
                     V.idempresa, V.IdTrabajador,
                     Idcontrato=MAX(V.Idcontrato), V.Ano, V.Mes, HrsDia=SUM(V.HRSNORM), HrsNoct=SUM(V.HRSNOCT), HrsEx25=SUM(V.HRSEX25), HrsEx35=SUM(V.HrsEx35),
                     HrsExNoc25=SUM(V.HrsExNoc25), HrsExNoc35=SUM(V.HrsExNoc35)
-                FROM VIEW_HORAS_DIAS V WHERE V.IdEmpresa=$empresaId AND V.IdZona IN(SELECT NUMBER FROM dbo.TblArr('0,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,90,0')) AND (V.IDTRABAJADOR=NULL OR NULL IS NULL) AND (V.ANO=$anio OR $anio IS NULL)
+                FROM VIEW_HORAS_DIAS V
+                WHERE V.IdEmpresa=$empresaId
+                AND (V.IDTRABAJADOR=NULL OR NULL IS NULL) AND (V.ANO=$anio OR $anio IS NULL)
                 AND (V.MES=$mes OR $mes IS NULL) and V.CorteDias=1-- solo  tomar hasta el 15
                 GROUP BY V.idempresa, V.IdTrabajador, V.Ano, V.Mes
             ) croos
