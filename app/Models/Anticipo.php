@@ -95,7 +95,12 @@ class Anticipo extends Model
         $anticipos = DB::select(
             "
             SELECT
-                T.RutTrabajador,
+                CASE
+                    WHEN t.IdTipoDctoIden = 1
+                        THEN RIGHT('000000' + CAST(t.RutTrabajador as varchar), 8)
+                    ELSE
+                        RIGHT('000000' + CAST(t.RutTrabajador as varchar), 9)
+                END AS RutTrabajador,
                 A.IdAnticipo,A.IdTrabajador as [Id Trabajador],
                 A.Monto AS Monto,
                 AD.SueldoAlaFecha,
