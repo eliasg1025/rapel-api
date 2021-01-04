@@ -97,7 +97,7 @@ class Contrato extends Model
                         WHEN IdRegimen = 2
                             THEN CAST(ROUND(SueldoBase, 2, 0) as decimal(18, 2))
                         WHEN IdRegimen = 3
-                            THEN CAST(ROUND(SueldoBase * 1.2638 * 30, 2, 0) as decimal(18, 2))
+                            THEN CAST(ROUND((SueldoBase * 1.2638 * 30) + BONO_LABOR, 2, 0) as decimal(18, 2))
                         ELSE
                             CAST(ROUND(SueldoBase * 1.2638, 2, 0) as decimal(18, 2))
                     END AS sueldo_bruto
