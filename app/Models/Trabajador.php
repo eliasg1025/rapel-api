@@ -440,7 +440,7 @@ class Trabajador extends Model
         $detalles = DB::table('Liquidacion as l')
             ->select(
                 'l.idLiquidacion as liquidacion_id',
-                DB::raw("(CAST(co.IdConcepto AS NVARCHAR(8)) + ' ' + co.Descripcion) as concepto"),
+                DB::raw("(dl.IdDtalle + ' ' + co.Descripcion) as concepto"),
                 DB::raw("
                     CAST((
                         CASE
