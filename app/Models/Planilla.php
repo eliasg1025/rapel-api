@@ -97,10 +97,10 @@ class Planilla extends Model
                             THEN RIGHT('000000' + CAST(t.RutTrabajador as varchar), 8)
                         ELSE
                             RIGHT('000000' + CAST(t.RutTrabajador as varchar), 9)
-                    END AS trabajador_id,
+                    END AS trabajador_id
                     "
                 ),
-                DB::raw("(CAST(co.IdConcepto AS NVARCHAR(8)) + ' ' + co.Descripcion) as concepto"),
+                DB::raw("(dl.IdDetalle + ' ' + co.Descripcion) as concepto"),
                 DB::raw("
                     CAST((
                         CASE
