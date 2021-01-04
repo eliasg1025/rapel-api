@@ -90,17 +90,7 @@ class Planilla extends Model
         $result = DB::table('Liquidacion as l')
             ->select(
                 'l.RutTrabajador as trabajador_id',
-                DB::raw(
-                    "
-                    CASE
-                        WHEN t.IdTipoDctoIden = 1
-                            THEN RIGHT('000000' + CAST(t.RutTrabajador as varchar), 8)
-                        ELSE
-                            RIGHT('000000' + CAST(t.RutTrabajador as varchar), 9)
-                    END AS trabajador_id
-                    "
-                ),
-                DB::raw("(dl.IdDetalle + ' ' + co.Descripcion) as concepto"),
+                DB::raw("(CAST(co.IdConcepto AS NVARCHAR(8)) + ' ' + co.Descripcion) as concepto"),
                 DB::raw("
                     CAST((
                         CASE
