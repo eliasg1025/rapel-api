@@ -286,14 +286,14 @@ class Trabajador extends Model
             )
             ->join('dbo.Contratos as c', [
                 'c.IdEmpresa'     => 't.IdEmpresa',
-                'c.RutTrabajador' => 't.RutTrabajador'
+                'c.IdTrabajador' => 't.IdTrabajador'
             ])
             ->joinSub($trabajadores, 'trab', function($join) {
                 $join->on('trab.IdTrabajador', '=', 't.IdTrabajador')
                 ->on('trab.IdEmpresa', '=', 't.IdEmpresa');
             })
             ->whereIn('c.IdEmpresa', [9, 14])
-            ->whereIn('c.IdRegimen', [1, 2])
+            ->whereIn('c.IdRegimen', [1, 2, 4])
             ->where('c.IndicadorVigencia', '1')
             ->where('c.Jornal', '0')
             ->where('trab.Nombres', 'like', '%' . $busqueda . '%')
