@@ -187,7 +187,7 @@ class Anticipo extends Model
 
             if ($row->Beta > 0) {
                 array_push($detalles, [
-                    'trabajador_id' => $row->Beta,
+                    'trabajador_id' => $row->RutTrabajador,
                     'concepto'      => 'BONO BETA',
                     'monto'         => round($row->Beta, 2),
                     'tipo'          => 0,
