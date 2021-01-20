@@ -190,7 +190,7 @@ class Anticipo extends Model
                     'trabajador_id' => $row->RutTrabajador,
                     'concepto'      => 'BONO BETA',
                     'monto'         => round($row->Beta, 2),
-                    'tipo'          => 0,
+                    'tipo'          => 1,
                 ]);
             }
 
