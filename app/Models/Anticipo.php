@@ -113,7 +113,7 @@ class Anticipo extends Model
                 ad.CtsAgraria,
                 ad.GratificacionAgraria,
                 AD.BonoPacking,
-
+                AD.Beta,
                 AD.MontoAfp,
                 AD.Impuesto,
                 ad.OtrosDescuentos
