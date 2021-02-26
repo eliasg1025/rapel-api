@@ -34,7 +34,7 @@ class ZonaLabor extends Model
 
         $name = trim(explode('(', $zona->name)[0]);
 
-        $zona_labor = ZonaLabor::whereIn('IdEmpresa', ['9', '14'])
+        $zona_labor = ZonaLabor::select('IdZona as id', 'IdEmpresa as empresa_id', 'Nombre as name')->whereIn('IdEmpresa', ['9', '14'])
             ->where('Nombre', 'like', '%' . $name . '%')
             ->where('Nombre', 'not like', '%OBREROS%')
             ->first();
