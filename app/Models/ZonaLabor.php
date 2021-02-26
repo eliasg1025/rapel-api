@@ -27,9 +27,22 @@ class ZonaLabor extends Model
 
     public static function _show($id_empresa, $id)
     {
-        return self::where([
+        $zona = self::where([
             'IdEmpresa' => $id_empresa,
             'IdZona' => $id
         ])->select('IdZona as id', 'IdEmpresa as empresa_id', 'Nombre as name')->first();
+
+        $name = trim(explode('(', $zona->name)[0]);
+
+        $zona_labor = ZonaLabor::whereIn('IdEmpresa', ['9', '14'])
+            ->where('Nombre', 'like', '%' . $name . '%')
+            ->where('Nombre', 'not like', '%OBREROS%')
+            ->first();
+
+        if ($zona_labor) {
+            return $zona_labor;
+        }
+
+        return $zona;
     }
 }
