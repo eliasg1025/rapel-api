@@ -224,7 +224,7 @@ class Trabajador extends Model
                 'c.IdRegimen as regimen_id',
                 DB::raw('
                     CASE
-                        WHEN c.IdRegimen = 2
+                        WHEN c.IdRegimen = 2 or c.IdRegimen = 4
                             THEN CAST(ROUND(c.SueldoBase, 2, 0) as decimal(18, 2))
                         WHEN c.IdRegimen = 3
                             THEN CAST(ROUND(c.SueldoBase * 1.2638 * 30, 2, 0) as decimal(18, 2))
