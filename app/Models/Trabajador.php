@@ -411,7 +411,7 @@ class Trabajador extends Model
                 't.IdEmpresa' => 'c.IdEmpresa',
                 't.RutTrabajador' => 'c.RutTrabajador'
             ])
-            ->join('dbo.Banco as b', [
+            ->leftJoin('dbo.Banco as b', [
                 'b.IdEmpresa' => 't.IdEmpresa',
                 'b.IdBanco' => 't.IdBanco'
             ])
