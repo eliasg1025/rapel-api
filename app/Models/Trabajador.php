@@ -242,8 +242,18 @@ class Trabajador extends Model
                 'o.IdEmpresa' => 'c.IdEmpresa',
                 'o.IdOficio' => 'c.IdOficio'
             ])
-            ->where('c.IndicadorVigencia', true)
-            ->whereNull('c.FechaTermino')
+            ->where(function($query) {
+                $query
+                    ->where(function($query) {
+                        $query
+                            ->where('c.IndicadorVigencia', true)
+                            ->whereNull('c.FechaTermino');
+                    })
+                    ->orWhere(function($query) {
+                        $query->whereDate('c.FechaTermino', '>=', '2021-04-01')
+                            ->whereDate('c.FechaTermino', '<=', '2021-04-30');
+                    });
+            })
             ->when($actual, function($query) {
                 $query->whereDate('c.FechaInicioPeriodo', '<=', Carbon::now()->lastOfMonth());
             })
