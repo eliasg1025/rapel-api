@@ -136,7 +136,11 @@ class Contrato extends Model
                     //dd($name);
                     $zona_labor = ZonaLabor::whereIn('IdEmpresa', ['9', '14'])->where('Nombre', 'like', '%' . $name . '%')->where('Nombre', 'not like', '%OBREROS%')->first();
                     if ($zona_labor) {
-                        $contrato->zona_id = $zona_labor->IdZona;
+                        if ($zona_labor->IdZona == 13) {
+                            $contrato->zona_id = 55;
+                        } else {
+                            $contrato->zona_id = $zona_labor->IdZona;
+                        }
                     }
 
                     return $contrato;
