@@ -27,6 +27,14 @@ class ZonaLabor extends Model
 
     public static function _show($id_empresa, $id)
     {
+        switch ($id) {
+            case 65:
+                $id = 55;
+                break;
+            default:
+                break;
+        }
+
         $zona = self::where([
             'IdEmpresa' => $id_empresa,
             'IdZona' => $id
